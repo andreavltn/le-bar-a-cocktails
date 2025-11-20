@@ -34,7 +34,7 @@ a:hover {
     align-items: center;
 }
 
-.logo-site {
+.banniere-bloc-gauche img {
     width: 100px;
 }
 
@@ -71,4 +71,51 @@ a:hover {
 /* Contenu principal */
 .contenu {
     padding: 30px;
+    height: 500px;
+}
+
+.intro-titre {
+    color: #b89e14;
+    font-size: 50px;
+    font-weight: bold;
+    padding-bottom: 50px;
+}
+
+.bloc-intro {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+
+.bloc-intro-texte {
+    flex: 1;
+    font-size: 28px;
+    line-height: 1.6;
+    color: #333;
+}
+
+.image-intro {
+    flex: 1;
+}
+
+.image-intro img {
+    width: 100%;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.bouton-intro-decouvrir {
+    display: block;
+    width: max-content;
+    margin: 50px auto 0;
+    padding: 10px 20px;
+    background-color: black;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.bouton-intro-decouvrir:hover {
+    background-color: #333;
 }
