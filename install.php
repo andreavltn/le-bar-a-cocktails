@@ -15,16 +15,16 @@
             CREATE TABLE utilisateur (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 pseudo VARCHAR(20) UNIQUE NOT NULL,
-                mdp VARCHAR(255) NOT NULL,
+                mdp VARCHAR(40) NOT NULL,
                 nom VARCHAR(100),
                 prenom VARCHAR(100),
                 sexe ENUM('H', 'F'),
-                email VARCHAR(150),
+                email VARCHAR(100),
                 date_naissance DATE,
                 adresse VARCHAR(255),
-                code_postal VARCHAR(10),
+                code_postal VARCHAR(5),
                 ville VARCHAR(100),
-                tel VARCHAR(20)
+                tel VARCHAR(10)
             );
         ");
 
