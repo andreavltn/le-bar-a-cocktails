@@ -1,7 +1,7 @@
 <?php
     try {
 
-        // connexion à localhost
+        // connexion à MySQL en local
         $pdo = new PDO("mysql:host=localhost", "root", ""); 
 
         // création de la base (avec encodage permettant les caractères spéciaux)
