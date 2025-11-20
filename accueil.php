@@ -28,7 +28,7 @@
         </div>
 
         <div class="banniere-bloc-droite">
-            <img src="images/logo-compte.png" alt="logo-compte.png" class="logo-compte">
+            <img src="images/logo-compte.png" alt="logo-compte.png">
             <a href="#">Connexion</a>
         </div>
     </header>

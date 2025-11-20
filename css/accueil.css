@@ -64,7 +64,7 @@ a:hover {
     color: white;
 }
 
-.logo-compte {
+.banniere-bloc-droite img {
     width: 50px;
 }
 
@@ -74,6 +74,14 @@ a:hover {
     height: 500px;
 }
 
+/* Bloc complet de l'introduction */
+.bloc-intro {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+
+/* Le titre 'Bienvenue sur le site!' */
 .intro-titre {
     color: #b89e14;
     font-size: 50px;
@@ -81,12 +89,7 @@ a:hover {
     padding-bottom: 50px;
 }
 
-.bloc-intro {
-    display: flex;
-    align-items: center;
-    gap: 40px;
-}
-
+/* Le texte en dessous du titre */
 .bloc-intro-texte {
     flex: 1;
     font-size: 28px;
@@ -94,6 +97,7 @@ a:hover {
     color: #333;
 }
 
+/* Le bloc de l'image à droite */
 .image-intro {
     flex: 1;
 }
@@ -104,6 +108,7 @@ a:hover {
     object-fit: cover;
 }
 
+/* Le bouton découvrir */
 .bouton-intro-decouvrir {
     display: block;
     width: max-content;
