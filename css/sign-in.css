@@ -1,0 +1,142 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+a {
+    text-decoration: none;
+    color: white;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: #ccc;
+}
+
+/* Bannière en haut du site */
+.banniere {
+    background-color: black;
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Bloc milieu (logo) */
+.banniere-bloc-milieu {
+    display: flex;
+    align-items: center;
+}
+
+.banniere-bloc-milieu img {
+    width: 100px;
+    height: auto;
+    display: block;
+}
+
+/* Contenu principal */
+.contenu {
+    padding: 16px;
+    height: auto;
+}
+
+/* Bloc complet du formulaire d'inscription */
+.formulaire {
+    width: 720px;
+    margin: auto;
+    background: #fff;
+    padding: 14px;
+    border-radius: 8px;
+    box-shadow: 0 6px 18px #333;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+/* Le titre 'Créer un compte' du formulaire */
+.titre-formulaire {
+    color: #111;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+/* Chaque section du formulaire */
+.section-formulaire {
+    margin-bottom: 8px;
+}
+
+/* Les titres des cases */
+.formulaire label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+/* Les cases et les listes */
+.formulaire input,
+.formulaire select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+/* Disposition en grille du formulaire : 2 colonnes de 6 cases */
+.formulaire-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0px 16px;
+}
+
+/* faire en sorte que les colonnes sections soient directement enfants de la grid */
+.formulaire-col {
+    display: contents; 
+}
+
+/* Le bouton 'S'inscrire' */
+.bouton-sinscrire {
+    width: 100%;
+    padding: 10px 12px;
+    margin-top: 8px;
+    background: black;
+    color: #b89e14;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.bouton-sinscrire:hover {
+    background: #222;
+    transition: 0.2s;
+}
+
+/* Le bloc complet 'Déjà un compte ?' en bas du formulaire */
+.bloc-seconnecter {
+    margin-top: 8px;
+    text-align: center;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Le texte 'Déjà un compte ?' */
+.texte-seconnecter {
+    color: #333;
+    font-size: 14px;
+}
+
+/* Le mot cliquable 'Se connecter' */
+.lien-seconnecter {
+    color: #b89e14;
+    font-weight: 600;
+    text-decoration: none;
+}

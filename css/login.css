@@ -1,0 +1,121 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Bannière en haut du site */
+.banniere {
+    background-color: black;
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: center; /* centre le contenu horizontalement sur la page de connexion */
+    align-items: center;
+}
+
+/* Bloc milieu (logo) */
+.banniere-bloc-milieu {
+    display: flex;
+    align-items: center;
+}
+
+.banniere-bloc-milieu img {
+    width: 100px;
+    height: auto;
+    display: block;
+}
+
+/* Contenu principal */
+.contenu {
+    padding: 32px;
+    height: 500px;
+}
+
+/* Bloc complet du formulaire de connexion  */
+.formulaire {
+    width: 360px;
+    margin: auto;
+    background: #fff;
+    padding: 14px;
+    border-radius: 8px;
+    box-shadow: 0 6px 18px #333;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+/* Le titre 'Se connecter' du formulaire */
+.titre-formulaire {
+    margin-bottom: 8px;
+    color: #111;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* Chaque section du formulaire */
+.section-formulaire {
+    margin-bottom: 8px;
+}
+
+/* Les noms des inputs */
+.formulaire label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+/* Les cases d'input */
+.formulaire input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+/* Le bouton 'Se connecter' */
+.bouton-seconnecter {
+    width: 100%;
+    padding: 10px 12px;
+    margin-top: 8px;
+    background: black;
+    color: #b89e14;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.bouton-seconnecter:hover {
+    background: #222;
+    transition: 0.2s;
+}
+
+/* Le bloc complet "Pas encore de compte?" en bas du formulaire */
+.section-sinscrire {
+    margin-top: 8px;
+    text-align: center;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Le texte 'Pas encore de compte ?' */
+.texte-sinscrire {
+    color: #333;
+    font-size: 14px;
+}
+
+/* Le mot cliquable 'S'inscrire' */
+.lien-sinscrire {
+    color: #b89e14;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+

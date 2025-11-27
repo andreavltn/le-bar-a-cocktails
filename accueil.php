@@ -29,7 +29,7 @@
 
         <div class="banniere-bloc-droite">
             <img src="images/logo-compte.png" alt="logo-compte.png">
-            <a href="#">Connexion</a>
+            <a href="account/login.php">Connexion</a>
         </div>
     </header>
 
