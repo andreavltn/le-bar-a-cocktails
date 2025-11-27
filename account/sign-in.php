@@ -44,7 +44,6 @@
                             <option value="">- Choisir -</option>
                             <option value="H">Homme</option>
                             <option value="F">Femme</option>
-                            <option value="A">Autre</option>
                         </select>
                     </div>
 
