@@ -1,5 +1,5 @@
 <?php
-    include 'donnee.inc.php'; 
+    include 'Donnees.inc.php'; 
     // Connexion à MySQL
     $mysqli = mysqli_connect("localhost", "root", "", "");
     
@@ -9,6 +9,8 @@
     }
 
     // Création de la base
+    $mysqli->query("DROP DATABASE IF EXISTS boissons");
+
     $requete = "CREATE DATABASE IF NOT EXISTS boissons CHARACTER SET utf8mb4;";
     if (!mysqli_query($mysqli, $requete)) {
         die("Erreur création base : " . mysqli_error($mysqli));
@@ -127,7 +129,7 @@
 	die("Erreur création table hierarchie : " . mysqli_error($mysqli));
     }
     
-        foreach ($Recettes as $nom => $data) {  //parcours de l'array hierarchie
+        foreach ($Hierarchie as $nom => $data) {  //parcours de l'array hierarchie
 
          $nom = $mysqli -> escape_string($nom);
          $requete = "SELECT id_aliment FROM aliments WHERE nom = '$nom';";
@@ -139,7 +141,8 @@
          if (isset($data['sous-categorie']) && is_array($data['sous-categorie'])) { //check si l'aliment a une sous categorie
          
         foreach ($data['sous-categorie'] as $sous_nom) {            //regarde les sous categories de l'element ou on est
-                  $requete = "SELECT id_aliment FROM aliments WHERE nom = '$sous_nom';";
+                $sous_nom = $mysqli -> escape_string($sous_nom);
+                $requete = "SELECT id_aliment FROM aliments WHERE nom = '$sous_nom';";
          
          		$result = mysqli_query($mysqli, $requete); 
          		$row = mysqli_fetch_row($result);
@@ -177,7 +180,7 @@
     	while ($i < count($Recettes)) {   //parcours de l'array recette 
 
          $titre = $mysqli -> escape_string($Recettes[$i]["titre"]);
-         $requete = "SELECT id_recette FROM recettes WHERE nom = '$titre';";
+         $requete = "SELECT id_recette FROM recettes WHERE titre = '$titre';";
          
          $result = mysqli_query($mysqli, $requete); 
          $row = mysqli_fetch_row($result);
@@ -185,33 +188,29 @@
          
         
         foreach ($Recettes[$i]['index'] as $ingredient) {            //regarde les sous categories de l'element ou on est
-                  $requete = "SELECT id_aliment FROM aliments WHERE nom = '$ingredient';";
+                $ingredient = $mysqli -> escape_string($ingredient);
+                $requete = "SELECT distinct id_aliment FROM aliments WHERE nom = '$ingredient';";
          
          		$result = mysqli_query($mysqli, $requete); 
          		$row = mysqli_fetch_row($result);
          		$idingredient = $row[0];
          
     	
-         	$requete = "INSERT INTO ingredient_recette(id_recette,id_ingredient)
-                    	VALUES ($idrecette,idingredient);";    //ajoute a la table l'aliment et une de ses sous categories
+         	$requete = "INSERT IGNORE INTO ingredient_recette(id_recette,id_ingredient)
+                    	VALUES ($idrecette,$idingredient);";    //ajoute a la table l'aliment et une de ses sous categories
 
     if (!mysqli_query($mysqli, $requete)) {
 	die("Erreur création update table ingredient_recette " . mysqli_error($mysqli));
 	
 	
-	}
-    }}
+	        }
+        }
+    $i++;    
     }
     
     
     
-    
-    
-    
-    
-    
-    
-    
+
 
 
     echo "La base a été créée avec succès !";
