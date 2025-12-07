@@ -1,195 +1,231 @@
 <?php
-//include de la db avec qdb(requete) 
 include 'connect_db.php';
 
-//recupere tout les aliments
+// recuper les données des tables et le met dans des tableaux
+
+
 $liste_aliment = qdb("SELECT id_aliment, nom FROM aliments ORDER BY nom ASC");
+$aliments = [];
+while ($aliment = mysqli_fetch_assoc($liste_aliment)) $aliments[] = $aliment;
 
-//recupere toutes les boissons
+
+
+$hierarchie_aliments = qdb("SELECT id_aliment, id_sous_categorie FROM hierarchie");
+$hierarchie = [];
+while ($hie = mysqli_fetch_assoc($hierarchie_aliments)) $hierarchie[] = $hie;
+
+
 $liste_boisson = qdb("SELECT id_recette, titre FROM recettes ORDER BY titre ASC");
+$boissons = [];
+while ($boisson = mysqli_fetch_assoc($liste_boisson)) $boissons[] = $boisson;
 
 
+$recette = qdb("SELECT id_recette, id_ingredient FROM ingredient_recette");
+$contenu_recette = [];
+while ($alim = mysqli_fetch_assoc($recette)) $contenu_recette [] = $alim;
 
-// --------------- REQUETE DE LA BARRE DE RECHERCHE DES ALIMENTS ---------------- //
-
-$resultatsingredient = null;
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["recherche"])) {
-
-    $rechercheingredient = mysqli_escape_string($dblink, $_POST["recherche"]);   
-
-    $request = "SELECT * FROM aliments WHERE true ";    //true pour pouvoir mettre and dans tout les if
-
-    if (!empty($rechercheingredient)) {
-        $mots = explode(" ", $rechercheingredient);   // separe les mots de la recherche
-        foreach ($mots as $i){
-            $i = trim($i);                //enleve les espaces
-            if ($i !== "") {              // ne prend pas en compte les chaines vides
-
-            $request .= " AND nom LIKE '%$i%'";    //recherche les ingredients avec le mot demander dedans
-        }}}
-
-
-    $request .= " ORDER BY nom ASC";
-    $resultatsingredient = qdb($request);
-}
-
-
-// --------------- REQUETE DE LA BARRE DE RECHERCHE DES BOISSONS ---------------- //
-$resultatsboisson = null;
-
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["rechercheboisson"])) {
-
-    $rechercheboisson = mysqli_escape_string($dblink, $_POST["rechercheboisson"]);   
-
-    $request = "SELECT * FROM recettes WHERE true ";    //true pour pouvoir mettre and dans tout les if
-
-    if (!empty($rechercheboisson)) {
-        $mots = explode(" ", $rechercheboisson);   // separe les mots de la recherche
-        foreach ($mots as $i){
-            $i = trim($i);                //enleve les espaces
-            if ($i !== "") {              // ne prend pas en compte les chaines vides
-
-            $request .= " AND titre LIKE '%$i%'";    //recherche les ingredients avec le mot demander dedans
-        }}}
-
-
-    $request .= " ORDER BY titre ASC";
-    $resultatsboisson = qdb($request);
-}
 ?>
-
-
-
-
-<!-- -------------------------- -->
 
 
 
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Recherche d'aliments</title>
+<meta charset="UTF-8">
+<title>Recherche</title>
 
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        .result { padding: 10px; margin-top: 10px; background: #f3f3f3; border-radius: 4px; }
-        .form-control { padding: 6px; margin-right: 5px; }
-    </style>
 </head>
 <body>
 
-
-<!-- -------------RECHERCHE DES ALIMENTS ------------- -->
-
-
 <h2>Recherche d'aliments</h2>
 
-<form method="POST"  id="recherche">
-    <input type="hidden" name="type" value="aliment">
-    <input list="aliments" name="recherche" class="form-control" placeholder="Rechercher un aliment...">
 
-    <datalist id="aliments">                                    
-        <?php while ($a = mysqli_fetch_assoc($liste_aliment)):?>    <!-- parcours la liste les aliments-->
-                  
-            <option value="<?= htmlspecialchars($a['nom']) ?>"> <!-- remplit la datalist avec les nom des ingredients -->
-        <?php endwhile; ?>
-    </datalist>
-    <button type="submit">Rechercher</button>  
-</form>
+ <!-- barre de recherche des aliments -->
+
+<input type="text" id="rechercheAliment" class="form-control  rechercheAliment" list="aliments" placeholder="Rechercher un aliment...">  
+<datalist id="aliments">
+    <?php foreach ($aliments as $a): ?>
+        <option value="<?= htmlspecialchars($a['nom']) ?>"></option>
+    <?php endforeach ?>
+</datalist>
+<button id="bouttonRechercheAlim" style="padding:6px 12px;cursor:pointer;">
+        Rechercher
+    </button>
+
+<div id="GrilleAliments" class="stylegrille"></div>
+
+<div id="affichageMenuAliments" style="display:flex;align-items:center;cursor:pointer;">
+    <h3 id="texteFleche">Masquer</h3>
+    <span id="fleche" style="margin-left:10px;transition:.3s;">&#9650;</span>
+</div>
+
 <hr>
 
-
-
-<!-- Création de la grille qui affiche les aliments de la recherche -->
-
-
-<div class="stylegrille" id = GrilleAliments >
-    <?php if (!empty($resultatsingredient)): ?>
-        <?php while ($row = mysqli_fetch_assoc($resultatsingredient)): ?>   
-            <div class="stylegrilleinter"  id="<?= htmlspecialchars($row['id_aliment']) ?>"  onclick="alert(id)">
-
-
-                <strong><?= htmlspecialchars($row['nom']) ?></strong><br>  <!-- contient les ingredients qui correspondent à la requete  -->
-            </div>
-        <?php endwhile; ?>
-    <?php endif; ?>
-</div>
+<h2>Affichage boissons</h2>
 
 
 
-<div style="display: flex; align-items: center; cursor: pointer;" id="affichageMenuAliments">
-    <h3 id="texteFleche" style="margin-right: 10px;">Masquer</h3>
-    <span id="fleche" style="transition: transform 0.3s;">&#9650;</span>
-</div>
+<div id="GrilleBoissons" class="stylegrilleboissons"></div>
 
 
 
+<script>
+// convertit les resultats des select pour js //
+const aliments = <?= json_encode($aliments) ?>;   // >> id_aliment, nom //
+const boissons = <?= json_encode($boissons) ?>;    // >> id_recette, titre //
+const hierarchie = <?= json_encode($hierarchie) ?>;   // >> id_aliment, id_sous_categorie //
+const recette = <?= json_encode($contenu_recette) ?>;  // >> id_recette, id_ingredient //
 
+const recetteMap = new Map();     //crée la map id_recette >> liste ingredients
 
-<!-- -------------RECHERCHE DES Boissons ------------- -->
+recette.forEach(rec => {
+    if (!recetteMap.has(rec.id_recette)) {
+        recetteMap.set(rec.id_recette, []);   //on set la clée si elle n'existe pas
+    }
+    recetteMap.get(rec.id_recette).push(rec.id_ingredient); 
+});
 
+const hierarchiemap = new Map();     //crée la map id_ingredient >> liste sous ingredients
 
-<h2>Recherche de Boisson</h2>
-
-<form method="POST"  id="rechercheboisson">    
-    <input type="hidden" name="type" value="boisson">  
-    <input list="boissons" name="rechercheboisson" class="form-control" placeholder="Rechercher une boisson ">
-
-    <datalist id="boissons">                                    
-        <?php while ($a = mysqli_fetch_assoc($liste_boisson)):?>    <!-- parcours la liste des boissons -->
-                  
-            <option value="<?= htmlspecialchars($a['titre']) ?>"> <!-- remplit la datalist avec les nom des boissons -->
-        <?php endwhile; ?>
-    </datalist>
-    <button type="submit">Rechercher</button>  
-</form>
-<hr>
-
-
-
-<!-- Création de la grille qui affiche les boissons de la recherche -->
-
-
-<div class="stylegrilleboissons" id = GrilleBoissons >
-    <?php if (!empty($resultatsboisson)): ?>
-        <?php while ($row = mysqli_fetch_assoc($resultatsboisson)): ?>   
-            <div class="stylegrilleinterboissons"  id="<?= htmlspecialchars($row['id_recette']) ?>"  onclick="alert(id)">
-
-
-                <strong><?= htmlspecialchars($row['titre']) ?></strong><br>  <!-- contient les boissons qui correspondent à la requete  -->
-            </div>
-        <?php endwhile; ?>
-    <?php endif; ?>
-</div>
-
-
-
-<div style="display: flex; align-items: center; cursor: pointer;" id="affichageMenuBoisson">
-    <h3 id="texteFlecheboisson" style="margin-right: 10px;">Masquer</h3>
-    <span id="flecheboisson" style="transition: transform 0.3s;">&#9650;</span>
-</div>
+hierarchie.forEach(ingr => {
+    if (!hierarchiemap.has(ingr.id_aliment)) {
+        hierarchiemap.set(ingr.id_aliment, []);   //on set la clée si elle n'existe pas
+    }
+    hierarchiemap.get(ingr.id_aliment).push(ingr.id_sous_categorie); 
+});
 
 
 
 
 
+let alimentsSelect= [];
+
+function afficherGrille(data, domId, type="aliment") {
+    const container = document.getElementById(domId);
+    container.innerHTML = "";
+
+    data.forEach(item => {
+        const div = document.createElement("div");
+        div.className = type === "aliment" ? "stylegrilleinter" : "stylegrilleinterboissons";
+        div.id = item.id_aliment || item.id_recette;
+        div.innerHTML = `<strong>${item.nom || item.titre}</strong>`;
+        if (type === "aliment"){
+        div.onclick = () => {sousaliments(div.id);    filtrerBoissons(alimentsSelect); 
+
+        if (alimentsSelect.includes(div.id)) {   
+            div.classList.add("selected");
+        }
+        else{
+             div.classList.remove("selected");
+
+        }}}
+        container.appendChild(div);
+    });
+}
+
+// Filtre les aliments afficher en fonction de la barre de recherche
+function filtrerAliments() {
+    const recherche = rechercheAliment.value.trim().toLowerCase();
+    const mots = recherche.split(" ").filter(m => m);
+
+    // Filtrer les aliments dont le nom contient tous les mots recherchés
+    const resultat = aliments.filter(aliment =>
+        mots.every(m => aliment.nom.toLowerCase().includes(m))
+    );
+
+    afficherGrille(resultat, "GrilleAliments", "aliment");
+    return resultat.map(a => a.id_aliment);
+}
 
 
-<!-- -----------GESTION DES STYLES ----------- -->
+
+//ajoute un aliment dans les aliments selectionnés , l'enleve de la liste si il est deja present
+function ajouterAlimentSelect(id) {
+  if (alimentsSelect.includes(id)) {
+    alimentsSelect = alimentsSelect.filter(idalim => idalim !== id);
+  } else {
+    alimentsSelect.push(id);
+  }
+}
+
+
+
+    //affiche les boissons selon le filtre aliments
+function filtrerBoissons(idIngredientsSelectionnes) {
+
+    // pour les ou
+    // const resultat = boissons.filter(b => recette.filter(r => idIngredientsSelectionnes.includes(r.id_ingredient)).map(r => r.id_recette).includes(b.id_recette));
+    // pour les et
+
+  const resultat = boissons.filter(b => idIngredientsSelectionnes.every(id => (recetteMap.get(b.id_recette).includes(id))));
+
+
+    // Afficher dans la grille
+    afficherGrille(resultat, "GrilleBoissons", "boisson");
+}
+
+//prend l'id d'un aliment et retoune tous les sous aliment
+
+function sousaliments(id){
+    if (hierarchiemap.has(id)){
+            
+    }
+    else{
+    ajouterAlimentSelect(id);
+}}
+
+
+
+//ecouteur sur le bonton rechercher
+document.getElementById("bouttonRechercheAlim").onclick = () => {
+    filtrerAliments(); 
+};
+
+
+// Affichage initial (tout)
+afficherGrille(aliments, "GrilleAliments");
+afficherGrille(boissons, "GrilleBoissons");
+
+// ---------------------- Gestion Masquer / Afficher -------------------------
+function toggleMenu(btnId, grilleId, textId, flecheId,id){
+    const btn = document.getElementById(btnId);
+    const grille = document.getElementById(grilleId);
+    const texte = document.getElementById(textId);
+    const fleche = document.getElementById(flecheId);
+    const recherche = document.getElementById(id);
+
+    btn.onclick = () => {
+        grille.classList.toggle("cache");
+        recherche.classList.toggle("cache");
+
+        if(grille.classList.contains("cache")){
+            texte.textContent = "Afficher";
+            fleche.style.transform = "rotate(180deg)";
+        } else {
+            texte.textContent = "Masquer";
+            fleche.style.transform = "rotate(0deg)";
+        }
+    }
+}
+
+toggleMenu("affichageMenuAliments","GrilleAliments","texteFleche","fleche","rechercheAliment");
+</script>
+
+
+
+
 
 <style>
 
-#recherche {
+#rechercheAliment {
     
     max-height: 60px;
-    transition: max-height 0.3s ease;
+    transition: all 0.3s ease;
 }
 
-#recherche.cache {
+#rechercheAliment.cache {
     
-    max-height: 0;
-    overflow: hidden;
+    display:none;
 }
 
 
@@ -220,6 +256,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["rechercheboisson"])) 
                 box-shadow: 0 0 5px rgba(116, 24, 24, 0.1); /* couleur ombre*/
                 background-color: #06ddb9ff;   /* couleur boite */
                 transition: transform 0.2s, background-color 0.2s; /* temps de l'animation du mouseover */
+}
+
+.stylegrilleinter.selected {
+    background-color: #14dd06ff;
 }
 
 .stylegrilleinter:hover {
@@ -280,53 +320,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["rechercheboisson"])) 
 
 
 
-<!-- ----------------------- PARTIE JS ------------------ -->
-
-
-
-
-<script>
-const affichageMenuAliments = document.getElementById('affichageMenuAliments');
-const texteFleche = document.getElementById('texteFleche'); 
-const recherche = document.getElementById('recherche');
-const menuGrille = document.getElementById('GrilleAliments');
-const fleche = document.getElementById('fleche');
-
-affichageMenuAliments.addEventListener('click', () => {       //S'active si on clic sur la fleche 
-    menuGrille.classList.toggle('cache');                 // les styles changent et cachent la recherche
-    recherche.classList.toggle('cache');
-
-
-    if (menuGrille.classList.contains('cache')) {
-        fleche.style.transform = 'rotate(180deg)';   // tourne la fleche
-        texteFleche.textContent = 'Afficher';       //change le texte
-    } else {
-        fleche.style.transform = 'rotate(0deg)';
-        texteFleche.textContent = 'Masquer';
-    }
-});
-
-
-
-const affichageMenuBoisson = document.getElementById('affichageMenuBoisson');
-const texteFlecheBoisson = document.getElementById('texteFlecheboisson');
-const rechercheBoisson = document.getElementById('rechercheboisson');
-const menuGrilleBoisson = document.getElementById('GrilleBoissons');
-const flecheBoisson = document.getElementById('flecheboisson');
-
-affichageMenuBoisson.addEventListener('click', () => {
-    menuGrilleBoisson.classList.toggle('cache');
-    rechercheBoisson.classList.toggle('cache');
-    if (menuGrilleBoisson.classList.contains('cache')) {
-        flecheBoisson.style.transform = 'rotate(180deg)';
-        texteFlecheBoisson.textContent = 'Afficher';
-    } else {
-        flecheBoisson.style.transform = 'rotate(0deg)';
-        texteFlecheBoisson.textContent = 'Masquer';
-    }
-});
-
-</script>
 
 </body>
 </html>
