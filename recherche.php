@@ -99,6 +99,8 @@ hierarchie.forEach(ingr => {
 
 
 let alimentsSelect= [];
+let alimentsInterdit= [];
+let superalimentsSelect= [];
 
 function afficherGrille(data, domId, type="aliment") {
     const container = document.getElementById(domId);
@@ -110,13 +112,18 @@ function afficherGrille(data, domId, type="aliment") {
         div.id = item.id_aliment || item.id_recette;
         div.innerHTML = `<strong>${item.nom || item.titre}</strong>`;
         if (type === "aliment"){
-        div.onclick = () => {sousaliments(div.id);    filtrerBoissons(alimentsSelect); 
+        div.onclick = () => {sousaliments(div.id);    filtrerBoissons(alimentsSelect,alimentsInterdit); 
 
         if (alimentsSelect.includes(div.id)) {   
             div.classList.add("selected");
         }
+        else if (alimentsInterdit.includes(div.id)) {   
+            div.classList.remove("selected");
+            div.classList.add("interdit");
+
+        }
         else{
-             div.classList.remove("selected");
+             div.classList.remove("interdit");
 
         }}}
         container.appendChild(div);
@@ -143,7 +150,12 @@ function filtrerAliments() {
 function ajouterAlimentSelect(id) {
   if (alimentsSelect.includes(id)) {
     alimentsSelect = alimentsSelect.filter(idalim => idalim !== id);
-  } else {
+    alimentsInterdit.push(id);
+  } 
+   else if (alimentsInterdit.includes(id)) {
+    alimentsInterdit = alimentsInterdit.filter(idalim => idalim !== id);
+  }
+  else {
     alimentsSelect.push(id);
   }
 }
@@ -151,28 +163,30 @@ function ajouterAlimentSelect(id) {
 
 
     //affiche les boissons selon le filtre aliments
-function filtrerBoissons(idIngredientsSelectionnes) {
+function filtrerBoissons(idIngredientsSelectionnes, alimentsInterdits) {
 
     // pour les ou
     // const resultat = boissons.filter(b => recette.filter(r => idIngredientsSelectionnes.includes(r.id_ingredient)).map(r => r.id_recette).includes(b.id_recette));
     // pour les et
 
-  const resultat = boissons.filter(b => idIngredientsSelectionnes.every(id => (recetteMap.get(b.id_recette).includes(id))));
-
-
+  let resultat = boissons.filter(b => idIngredientsSelectionnes.every(id => (recetteMap.get(b.id_recette).includes(id))));
+    resultat = resultat.filter(b => !recetteMap.get(b.id_recette).some(id => alimentsInterdits.includes(id)));
     // Afficher dans la grille
     afficherGrille(resultat, "GrilleBoissons", "boisson");
 }
 
 //prend l'id d'un aliment et retoune tous les sous aliment
 
-function sousaliments(id){
-    if (hierarchiemap.has(id)){
-            
+
+
+
+function sousaliments(id) {
+    if (hierarchiemap.has(id)) {
+                       // a faire
+    } else {
+        ajouterAlimentSelect(id); // si pas de sous-aliments, ajouter juste l'id
     }
-    else{
-    ajouterAlimentSelect(id);
-}}
+}
 
 
 
@@ -187,16 +201,17 @@ afficherGrille(aliments, "GrilleAliments");
 afficherGrille(boissons, "GrilleBoissons");
 
 // ---------------------- Gestion Masquer / Afficher -------------------------
-function toggleMenu(btnId, grilleId, textId, flecheId,id){
-    const btn = document.getElementById(btnId);
-    const grille = document.getElementById(grilleId);
-    const texte = document.getElementById(textId);
-    const fleche = document.getElementById(flecheId);
-    const recherche = document.getElementById(id);
-
+function afficherMenu(){
+    const btn = document.getElementById("affichageMenuAliments");
+    const grille = document.getElementById("GrilleAliments");
+    const texte = document.getElementById("texteFleche");
+    const fleche = document.getElementById("fleche");
+    const recherche = document.getElementById("rechercheAliment");
+    const bouton = document.getElementById("bouttonRechercheAlim");
     btn.onclick = () => {
         grille.classList.toggle("cache");
         recherche.classList.toggle("cache");
+        bouton.classList.toggle("cache");
 
         if(grille.classList.contains("cache")){
             texte.textContent = "Afficher";
@@ -208,7 +223,7 @@ function toggleMenu(btnId, grilleId, textId, flecheId,id){
     }
 }
 
-toggleMenu("affichageMenuAliments","GrilleAliments","texteFleche","fleche","rechercheAliment");
+afficherMenu();
 </script>
 
 
@@ -227,7 +242,10 @@ toggleMenu("affichageMenuAliments","GrilleAliments","texteFleche","fleche","rech
     
     display:none;
 }
-
+#bouttonRechercheAlim.cache {
+    
+    display:none;
+}
 
 .stylegrille {
     max-height: 280px; /* hauteur approximative de 4 cases de 50px + gap */
@@ -260,6 +278,9 @@ toggleMenu("affichageMenuAliments","GrilleAliments","texteFleche","fleche","rech
 
 .stylegrilleinter.selected {
     background-color: #14dd06ff;
+}
+.stylegrilleinter.interdit {
+    background-color: #dd0606ff;
 }
 
 .stylegrilleinter:hover {
