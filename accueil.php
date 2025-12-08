@@ -23,7 +23,7 @@
 
         <div class="banniere-bloc-milieu">
             <li class ="page-en-cours"><div>Accueil du site</div></li>
-            <li><a href="#">Rechercher une recette</a></li>
+            <li><a href="recherche.php">Rechercher une recette</a></li>
             <li><a href="#">Consulter les favoris</a></li>
         </div>
 
