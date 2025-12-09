@@ -30,17 +30,17 @@
                 <div class="formulaire-col">
                     <div class="section-formulaire">
                         <label for="nom">Nom</label>
-                        <input id="nom" name="nom" type="text" required>
+                        <input id="nom" name="nom" type="text">
                     </div>
 
                     <div class="section-formulaire">
                         <label for="prenom">Prénom</label>
-                        <input id="prenom" name="prenom" type="text" required>
+                        <input id="prenom" name="prenom" type="text">
                     </div>
 
                     <div class="section-formulaire">
                         <label for="sexe">Sexe</label>
-                        <select id="sexe" name="sexe" required>
+                        <select id="sexe" name="sexe">
                             <option value="">- Choisir -</option>
                             <option value="H">Homme</option>
                             <option value="F">Femme</option>
@@ -49,29 +49,29 @@
 
                     <div class="section-formulaire">
                         <label for="email">Email</label>
-                        <input id="email" name="email" type="email" required>
+                        <input id="email" name="email" type="email">
                     </div>
 
                     <div class="section-formulaire">
                         <label for="date_naissance">Date de naissance</label>
-                        <input id="date_naissance" name="date_naissance" type="date" required>
+                        <input id="date_naissance" name="date_naissance" type="date">
                     </div>
 
                     <div class="section-formulaire">
                         <label for="adresse">Adresse</label>
-                        <input id="adresse" name="adresse" type="text" required>
+                        <input id="adresse" name="adresse" type="text">
                     </div>
                 </div>
 
                 <div class="formulaire-col">
                     <div class="section-formulaire">
                         <label for="code_postal">Code postal</label>
-                        <input id="code_postal" name="code_postal" type="text" required>
+                        <input id="code_postal" name="code_postal" type="text">
                     </div>
 
                     <div class="section-formulaire">
                         <label for="ville">Ville</label>
-                        <input id="ville" name="ville" type="text" required>
+                        <input id="ville" name="ville" type="text">
                     </div>
 
                     <div class="section-formulaire">
@@ -80,7 +80,14 @@
                     </div>
 
                     <div class="section-formulaire">
-                        <label for="pseudo">Pseudo</label>
+                        <label for="pseudo">Pseudo
+                        <?php
+                            if (isset($_GET['erreur_pseudo'])){ // si un code erreur est renvoyé dans l'url
+                                // afficher message d'erreur
+                                echo "<span style='color: red; font-size: 14px; padding-left: 5px'> Un compte utilise déjà ce pseudo</span>"; 
+                            }
+                        ?>
+                        </label>
                         <input id="pseudo" name="pseudo" type="text" required>
                     </div>
 
@@ -105,6 +112,42 @@
         </form>
 
     </section>
+    
+    <script>
+
+        // vérifier si les deux mots de passes correspondent
+        const form = document.querySelector('.formulaire');
+        const mdpInput = document.getElementById('mdp');
+        const mdp2Input = document.getElementById('mdp2');
+        const submitBtn = document.querySelector('.bouton-sinscrire');
+        
+        // vérifier aussi quand on change le premier mdp
+        mdpInput.addEventListener('input', function() {
+            if (mdpInput.value !== mdp2Input.value) {
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.5';
+                submitBtn.style.cursor = 'not-allowed';
+            } else if (mdp2Input.value !== '') {
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+                submitBtn.style.cursor = 'pointer';
+            }
+        });
+
+        // vérifier aussi pour le deuxième
+        mdp2Input.addEventListener('input', function() {
+            if (mdpInput.value !== mdp2Input.value) {
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.5';
+                submitBtn.style.cursor = 'not-allowed';
+            } else {
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+                submitBtn.style.cursor = 'pointer';
+            }
+        });
+
+    </script>                        
 
 </body>
 </html>

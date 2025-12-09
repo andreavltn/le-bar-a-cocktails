@@ -9,7 +9,7 @@ $racine = qdb("
 ");
 
 
-//crée la table id racine // id sous aliment // nom sous aliment //
+// crée la table id racine // id sous aliment // nom sous aliment //
 
 $tablenomsousalim = qdb("SELECT  h.id_aliment AS base, h.id_sous_categorie AS idsousaliment, a.nom AS nomsousaliment
     FROM hierarchie h JOIN aliments a ON a.id_aliment = h.id_sous_categorie
@@ -17,7 +17,7 @@ $tablenomsousalim = qdb("SELECT  h.id_aliment AS base, h.id_sous_categorie AS id
 ");
 
 
-//crée la table nom >> idsouslim/nomsousalim
+// crée la table nom >> idsouslim/nomsousalim
 
 $arraynomsousalim = [];
 

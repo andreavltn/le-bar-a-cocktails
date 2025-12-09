@@ -1,6 +1,7 @@
 <?php
     include 'Donnees.inc.php'; 
-    // Connexion à MySQL
+
+    // connexion à MySQL
     $mysqli = mysqli_connect("localhost", "root", "", "");
     
 
@@ -8,7 +9,7 @@
         die("Erreur de connexion : " . mysqli_connect_error());
     }
 
-    // Création de la base
+    // création de la base
     $mysqli->query("DROP DATABASE IF EXISTS boissons");
 
     $requete = "CREATE DATABASE IF NOT EXISTS boissons CHARACTER SET utf8mb4;";
@@ -16,12 +17,12 @@
         die("Erreur création base : " . mysqli_error($mysqli));
     }
 
-    // Sélection de la base
+    // sélection de la base
     if (!mysqli_select_db($mysqli, "boissons")) {
         die("Erreur sélection base : " . mysqli_error($mysqli));
     }
 
-    // Création table utilisateur
+    // création table utilisateur
     $requete = "
         CREATE TABLE utilisateur (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -43,7 +44,7 @@
         die("Erreur création table utilisateur : " . mysqli_error($mysqli));
     }
 
-    // Création table favoris
+    // création table favoris
     $requete = "
         CREATE TABLE favoris (
             id_user INT NOT NULL,
@@ -57,7 +58,7 @@
         die("Erreur création table favoris : " . mysqli_error($mysqli));
     }
     
-    //Création table recette
+    // création table recette
     $requete = "
         CREATE TABLE recettes (
     	id_recette INT AUTO_INCREMENT PRIMARY KEY,
@@ -72,25 +73,25 @@
     
     
     $i = 0;
-    while ($i < count($Recettes)) {   //parcours de l'array recette
+    while ($i < count($Recettes)) {   // parcours de l'array recette
 
-    $titre = $mysqli -> escape_string($Recettes[$i]["titre"]);
-    $ingredients = $mysqli -> escape_string($Recettes[$i]["ingredients"]);
-    $preparation = $mysqli -> escape_string($Recettes[$i]["preparation"]);
+        $titre = $mysqli -> escape_string($Recettes[$i]["titre"]);
+        $ingredients = $mysqli -> escape_string($Recettes[$i]["ingredients"]);
+        $preparation = $mysqli -> escape_string($Recettes[$i]["preparation"]);
+        
+        $requete = "INSERT INTO recettes (titre,ingredients,preparation)
+        VALUES ('$titre','$ingredients','$preparation');";          // on ajoute la ligne i à la table
     
-    $requete = "INSERT INTO recettes (titre,ingredients,preparation)
-    VALUES ('$titre','$ingredients','$preparation');";          //on ajoute la ligne i à la table
-
-    if (!mysqli_query($mysqli, $requete)) {
-	die("Erreur création update table recette " . mysqli_error($mysqli));
+        if (!mysqli_query($mysqli, $requete)) {
+            die("Erreur création update table recette " . mysqli_error($mysqli));
+        }
+        
+        
+        $i++;
     }
     
     
-    $i++;
-    }
-    
-    
-//Création table aliments
+    // Création table aliments
     $requete = "
         CREATE TABLE aliments (
     	id_aliment INT AUTO_INCREMENT PRIMARY KEY,
