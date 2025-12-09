@@ -120,30 +120,37 @@
         const mdpInput = document.getElementById('mdp');
         const mdp2Input = document.getElementById('mdp2');
         const submitBtn = document.querySelector('.bouton-sinscrire');
+
+        // sauvegarde du texte original du bouton
+        const texteBoutonOriginal = submitBtn.textContent;
         
-        // vérifier aussi quand on change le premier mdp
+        // vérifier quand on change le premier mdp
         mdpInput.addEventListener('input', function() {
-            if (mdpInput.value !== mdp2Input.value) {
-                submitBtn.disabled = true;
+            if (mdpInput.value !== mdp2Input.value) { // si les valeurs sont différentes
+                submitBtn.disabled = true; // le bouton de validation est désactivé
                 submitBtn.style.opacity = '0.5';
                 submitBtn.style.cursor = 'not-allowed';
+                submitBtn.textContent = 'Les deux mots de passe ne correspondent pas';
             } else if (mdp2Input.value !== '') {
-                submitBtn.disabled = false;
+                submitBtn.disabled = false; // sinon il est activé
                 submitBtn.style.opacity = '1';
                 submitBtn.style.cursor = 'pointer';
+                submitBtn.textContent = texteBoutonOriginal; // et on remet le texte original
             }
         });
 
-        // vérifier aussi pour le deuxième
+        // vérifier aussi pour le deuxième (exactement le même schéma)
         mdp2Input.addEventListener('input', function() {
-            if (mdpInput.value !== mdp2Input.value) {
-                submitBtn.disabled = true;
+            if (mdpInput.value !== mdp2Input.value) { 
+                submitBtn.disabled = true; 
                 submitBtn.style.opacity = '0.5';
                 submitBtn.style.cursor = 'not-allowed';
-            } else {
-                submitBtn.disabled = false;
+                submitBtn.textContent = 'Les deux mots de passe ne correspondent pas'; 
+            } else if (mdp2Input.value !== '') {
+                submitBtn.disabled = false; 
                 submitBtn.style.opacity = '1';
                 submitBtn.style.cursor = 'pointer';
+                submitBtn.textContent = texteBoutonOriginal;
             }
         });
 
