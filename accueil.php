@@ -25,11 +25,25 @@
             <li class ="page-en-cours"><div>Accueil du site</div></li>
             <li><a href="recherche.php">Rechercher une recette</a></li>
             <li><a href="#">Consulter les favoris</a></li>
+            <?php
+                // si on est connecté, affiche le bouton de déconnexion
+                if (isset($_SESSION["pseudo"])) {
+                    echo "<li><button class='bouton-deconnexion' onclick='confirmerDeconnexion()'>Se déconnecter</button></li>";
+                }
+            ?>
         </div>
 
         <div class="banniere-bloc-droite">
             <img src="images/logo-compte.png" alt="logo-compte.png">
-            <a href="account/login.php">Connexion</a>
+            <?php
+                // si on est connecté, affiche le pseudo
+                if (isset($_SESSION["pseudo"])) {
+                    echo "<span>" . $_SESSION["pseudo"] . "</span>";
+                } else {
+                    // sinon affiche "Connexion" qui renvoie vers la page de login
+                    echo "<a href='account/login.php'>Connexion</a>";
+                }
+            ?>
         </div>
     </header>
 
@@ -48,6 +62,16 @@
             </div>
         </div>
     </section>
+
+    <script>
+        // fonction qui affiche un pop up pour valider la déconnexion
+        function confirmerDeconnexion() {
+            if (confirm('Souhaitez vous vraiment vous déconnecter ?')) {
+                // redirection vers la page de déconnexion
+                window.location.href = 'account/logout.php';
+            }
+        }
+    </script>
 
 </body>
 </html>

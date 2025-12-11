@@ -18,7 +18,7 @@
 
     // si les deux mots de passe entrés ne correspondent pas
     if($mdp != $mdp2){ 
-        header("Location: sign-in.php?erreur_mdp=1"); // renvoi sur le formulaire avec l'erreur de mdp
+        header("Location: signup.php?erreur_mdp=1"); // renvoi sur le formulaire avec l'erreur de mdp
         exit(); // sortie
     }
 
@@ -31,13 +31,13 @@
         die("Erreur prepare: " . $dblink->error);
     }
 
-    $req_pseudo->bind_param("s", $pseudo); // la variable pseudo est une chaine
+    $req_pseudo->bind_param("s", $pseudo); // pseudo est un string
     $req_pseudo->execute(); // execution de la requête
     $resultat_pseudo = $req_pseudo->get_result(); // récupération du résultat
 
     // si un compte existe déjà avec le pseudo
     if($resultat_pseudo->num_rows==1){ 
-        header("Location: sign-in.php?erreur_pseudo=1"); // renvoi sur le formulaire avec l'erreur de pseudo
+        header("Location: signup.php?erreur_pseudo=1"); // renvoi sur le formulaire avec l'erreur de pseudo
         exit(); // sortie
     }
 
@@ -57,7 +57,7 @@
     $sql = "INSERT INTO utilisateur(pseudo, mdp, nom, prenom, sexe, email, date_naissance, adresse, code_postal, ville, tel) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; // requête d'insertion dans la base
     $req_finale = $dblink->prepare($sql); // préparation de la requête
-    $req_finale->bind_param("sssssssssss", // toutes les variables sont des chaines
+    $req_finale->bind_param("sssssssssss", // toutes les variables sont des string
         $pseudo, 
         $mdp, 
         $nom_val, 
@@ -71,5 +71,11 @@
         $tel_val); 
         
     $req_finale->execute(); // exécution de la requête
+
+    // affichage du popup et redirection
+    echo "<script>
+        alert('Le compte a été créé avec succès');
+        window.location.href = 'login.php';
+    </script>";
 
 ?>

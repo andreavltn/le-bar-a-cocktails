@@ -11,7 +11,7 @@
     <meta charset="UTF-8">
     <title>S'inscrire</title>
     <link rel="shortcut icon" href="../images/logo-site.png">
-    <link rel="stylesheet" href="../css/sign-in.css">
+    <link rel="stylesheet" href="../css/signup.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 
@@ -23,7 +23,7 @@
     </header>
 
     <section class="contenu">
-        <form class="formulaire" method="post" action="sign-in-check.php">
+        <form class="formulaire" method="post" action="signup-check.php">
             <div class="titre-formulaire">Créer un compte</div>
 
             <div class="formulaire-grid">

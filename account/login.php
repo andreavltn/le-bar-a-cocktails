@@ -26,11 +26,25 @@
         <form class="formulaire" method="post" action="login-check.php">
             <div class="titre-formulaire">Connexion</div>
             <div class="section-formulaire">
-                <label for="pseudo">Pseudo</label>
+                <label for="pseudo">Pseudo
+                <?php
+                    if (isset($_GET['erreur_pseudo'])){ // si un code erreur est renvoyé dans l'url
+                        // afficher message d'erreur
+                        echo "<span style='color: red; font-size: 14px; padding-left: 5px'> Ce pseudo n'existe pas</span>"; 
+                    }
+                ?>
+                </label>
                 <input id="pseudo" name="pseudo" type="text" required>
             </div>
             <div class="section-formulaire">
-                <label for="mdp">Mot de passe</label>
+                <label for="mdp">Mot de passe
+                <?php
+                    if (isset($_GET['erreur_mdp'])){ // si un code erreur est renvoyé dans l'url
+                        // afficher message d'erreur
+                        echo "<span style='color: red; font-size: 14px; padding-left: 5px'> Mot de passe incorrect</span>"; 
+                    }
+                ?>
+                </label>
                 <input id="mdp" name="mdp" type="password" required>
             </div>
             
@@ -38,7 +52,7 @@
                 
             <div class="section-sinscrire">
                 <div class="texte-sinscrire">Pas encore de compte ?</div>
-                <a class="lien-sinscrire" href="sign-in.php">S'inscrire</a>
+                <a class="lien-sinscrire" href="signup.php">S'inscrire</a>
             </div>
         </form>
 
