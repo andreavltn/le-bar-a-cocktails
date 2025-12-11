@@ -99,33 +99,64 @@ hierarchie.forEach(ingr => {
 
 
 let alimentsSelect= [];
-let alimentsInterdit= [];
-let superalimentsSelect= [];
+let  alimentsInterdit= [];
+let superalimentsSelect= new Map();
+let sousalimentsSelect=[];
+let sousalimentsNettoyage=[];
 
-function afficherGrille(data, domId, type="aliment") {
+function afficherGrille(data, domId, type = "aliment") {
     const container = document.getElementById(domId);
     container.innerHTML = "";
 
+    
     data.forEach(item => {
         const div = document.createElement("div");
         div.className = type === "aliment" ? "stylegrilleinter" : "stylegrilleinterboissons";
         div.id = item.id_aliment || item.id_recette;
         div.innerHTML = `<strong>${item.nom || item.titre}</strong>`;
-        if (type === "aliment"){
-        div.onclick = () => {sousaliments(div.id);    filtrerBoissons(alimentsSelect,alimentsInterdit); 
+        div.style.order = 50;
+        if (type === "aliment") {
+            div.onclick = () => {
+                sousaliments(div.id);
+                filtrerBoissons(alimentsSelect, alimentsInterdit);
 
-        if (alimentsSelect.includes(div.id)) {   
-            div.classList.add("selected");
+
+                if (alimentsSelect.includes(div.id)) {
+                    div.classList.add("selected");
+                    div.style.order = 10; 
+                
+                } 
+                else if (alimentsInterdit.includes(div.id)) {
+                    div.classList.remove("selected");
+                    div.classList.add("interdit");
+                    div.style.order = 20; 
+                } 
+                else if (superalimentsSelect.has(div.id)) {
+                    div.classList.add("selected");
+                    div.style.order = 5; 
+
+                    // Parcours des sous-aliments
+                    superalimentsSelect.get(div.id).forEach(val => {
+                        let sousDiv = document.getElementById(val);
+                        if (sousDiv) {
+                            sousDiv.classList.add("superalim");
+                            sousDiv.style.order = 30; 
+                        }
+                    });
+                } 
+                else {
+                    div.classList.remove("interdit");
+                    div.classList.remove("selected");
+                    while (sousalimentsNettoyage.length > 0) {
+                        let sousalim = document.getElementById(sousalimentsNettoyage.shift());
+                        if (sousalim) {
+                         sousalim.classList.remove("superalim");
+                        sousalim.style.order = 50; }}
+                   div.style.order = 50; 
+                }
+            };
         }
-        else if (alimentsInterdit.includes(div.id)) {   
-            div.classList.remove("selected");
-            div.classList.add("interdit");
 
-        }
-        else{
-             div.classList.remove("interdit");
-
-        }}}
         container.appendChild(div);
     });
 }
@@ -140,13 +171,22 @@ function filtrerAliments() {
         mots.every(m => aliment.nom.toLowerCase().includes(m))
     );
 
-    afficherGrille(resultat, "GrilleAliments", "aliment");
+    const container = document.getElementById("GrilleAliments");
+    const divs = Array.from(container.children);
+    divs.forEach(div => {
+        if (!resultat.some(item => item.id_aliment == div.id)) {
+            div.style.display = "none"; // masquer
+        } else {
+            div.style.display = "flex"; 
+        }
+    });
+
     return resultat.map(a => a.id_aliment);
 }
 
 
 
-//ajoute un aliment dans les aliments selectionnés , l'enleve de la liste si il est deja present
+//crée les tableaux des aliments selectionés
 function ajouterAlimentSelect(id) {
   if (alimentsSelect.includes(id)) {
     alimentsSelect = alimentsSelect.filter(idalim => idalim !== id);
@@ -157,8 +197,54 @@ function ajouterAlimentSelect(id) {
   }
   else {
     alimentsSelect.push(id);
+    console.log(alimentsSelect);
   }
 }
+
+
+function recupSousalim(id){
+    const result = [];
+
+    function boucle(key) {
+        const children =  hierarchiemap.get(key);
+  
+        if (!children) return;
+            
+        for (const child of children) {
+                 result.push(child);
+            boucle(child); // descendre dans la hiérarchie
+        }
+    }
+
+    boucle(id);
+return result;
+}
+
+
+function ajouterSuperAlimentSelect(id) {
+    let sousalim = [...recupSousalim(id).map(String)]
+    if (!superalimentsSelect.has(id)) {
+
+       superalimentsSelect.set(id,sousalim);
+       sousalimentsSelect.push(...sousalim);
+
+       
+    }
+    else{
+        superalimentsSelect.delete(id);
+        sousalim.forEach(val => {
+            let index = sousalimentsSelect.indexOf(val);
+            if (index !== -1) {
+                sousalimentsSelect.splice(index, 1);
+            }
+            index = sousalimentsSelect.indexOf(val);
+            if (index == -1) {
+            sousalimentsNettoyage.push(val);}
+
+        });
+}
+}
+
 
 
 
@@ -166,11 +252,19 @@ function ajouterAlimentSelect(id) {
 function filtrerBoissons(idIngredientsSelectionnes, alimentsInterdits) {
 
     // pour les ou
-    // const resultat = boissons.filter(b => recette.filter(r => idIngredientsSelectionnes.includes(r.id_ingredient)).map(r => r.id_recette).includes(b.id_recette));
+
     // pour les et
 
   let resultat = boissons.filter(b => idIngredientsSelectionnes.every(id => (recetteMap.get(b.id_recette).includes(id))));
     resultat = resultat.filter(b => !recetteMap.get(b.id_recette).some(id => alimentsInterdits.includes(id)));
+
+
+    resultat = resultat.filter(b => {
+    const ingredients = recetteMap.get(b.id_recette);
+    return Array.from(superalimentsSelect.values()).every(sousAlimGroup => {      // concatenation des ou
+        return sousAlimGroup.some(val => ingredients.includes(val));             // true si la recette contient ou moins 1 alim
+    });
+});
     // Afficher dans la grille
     afficherGrille(resultat, "GrilleBoissons", "boisson");
 }
@@ -178,11 +272,10 @@ function filtrerBoissons(idIngredientsSelectionnes, alimentsInterdits) {
 //prend l'id d'un aliment et retoune tous les sous aliment
 
 
-
-
+// differentie les aliments basiques des supeer aliments
 function sousaliments(id) {
     if (hierarchiemap.has(id)) {
-                       // a faire
+        ajouterSuperAlimentSelect(id);
     } else {
         ajouterAlimentSelect(id); // si pas de sous-aliments, ajouter juste l'id
     }
@@ -281,6 +374,10 @@ afficherMenu();
 }
 .stylegrilleinter.interdit {
     background-color: #dd0606ff;
+}
+
+.stylegrilleinter.superalim {
+    background-color: #c4b213ff;
 }
 
 .stylegrilleinter:hover {
