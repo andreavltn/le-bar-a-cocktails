@@ -118,7 +118,8 @@ function afficherGrille(data, domId, type = "aliment") {
         if (type === "aliment") {
             div.onclick = () => {
                 sousaliments(div.id);
-                filtrerBoissons(alimentsSelect, alimentsInterdit);
+                calculerScoresTableau(alimentsSelect, alimentsInterdit);
+       //         filtrerBoissons(alimentsSelect, alimentsInterdit);
 
 
                 if (alimentsSelect.includes(div.id)) {
@@ -255,6 +256,7 @@ function filtrerBoissons(idIngredientsSelectionnes, alimentsInterdits) {
 
     // pour les et
 
+
   let resultat = boissons.filter(b => idIngredientsSelectionnes.every(id => (recetteMap.get(b.id_recette).includes(id))));
     resultat = resultat.filter(b => !recetteMap.get(b.id_recette).some(id => alimentsInterdits.includes(id)));
 
@@ -269,7 +271,77 @@ function filtrerBoissons(idIngredientsSelectionnes, alimentsInterdits) {
     afficherGrille(resultat, "GrilleBoissons", "boisson");
 }
 
-//prend l'id d'un aliment et retoune tous les sous aliment
+
+
+
+
+    //affiche les boissons selon le filtre aliments
+function calculerScoresTableau(idIngredientsSelectionnes, alimentsInterdits) {
+    const scores = [];
+
+    boissons.forEach(b => {
+        const ingredients = recetteMap.get(b.id_recette);
+        let score = 0;
+        let total = 0;
+
+        // Score pour ingrédients sélectionnés (ET)
+        idIngredientsSelectionnes.forEach(id => {
+            if (ingredients.includes(id)) {score += 1;
+            }
+                          total += 1;
+        });
+
+        // Pénalité pour aliments interdits
+        alimentsInterdits.forEach(id => {
+            if (!ingredients.includes(id)) {score += 1;
+            
+            }
+                          total += 1;
+
+        });
+
+        // Score pour superalimentsSelect (OU)
+        Array.from(superalimentsSelect.values()).forEach(sousAlimGroup => {
+            if (sousAlimGroup.some(val => ingredients.includes(val))) {
+                score += 1;
+            }
+                          total += 1;
+        });
+
+        if (total == 0){
+            score = 100;
+        }
+        else {
+            score = (100*score)/total; 
+        }
+
+        scores.push({ id_recette: b.id_recette,  titre:b.titre , score : score });
+    });
+
+    // Trier par score décroissant
+    scores.sort((a, b) => b.score - a.score);
+    
+    
+   afficherGrille(scores, "GrilleBoissons", "boisson");
+    const container = document.getElementById("GrilleBoissons");
+    const divs = Array.from(container.children);
+
+divs.forEach(div => {
+    
+    const item = scores.find(i => i.id_recette == div.id);
+    if (!item) return; // sécurité
+
+    if (item.score >= 100) {
+        div.style.backgroundColor = "#14dd06"; // vert pour score élevé
+    } else if (item.score >= 50) {
+        div.style.backgroundColor = "#c4b213"; // jaune pour score moyen
+    } else {
+        div.style.backgroundColor = "#dd0606"; // rouge pour score faible
+    }
+});
+
+}
+
 
 
 // differentie les aliments basiques des supeer aliments
