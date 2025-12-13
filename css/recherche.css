@@ -1,0 +1,127 @@
+#rechercheAliment {
+    
+    height: 25px;
+    display: flex; gap: 2px; margin: 2px 2px;
+}
+
+
+
+.stylegrille {
+    max-height: 70vh;
+    overflow-y: auto;  /* scroll si plus de 4 cases */
+    flex-direction: column; 
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+        width: 100%; 
+    height: 100%;
+    flex-grow: 1; 
+    overflow-y: auto; 
+}
+
+
+.stylegrilleinter {
+                display: flex;     /* flex pour pouvoir gerer la case plus facilement */
+                flex-direction: column; 
+                justify-content: center;   /* centrage vertical */
+                align-items: center;       /* centrage horizontal */
+                height: 50px;             /* hauteur d'une boite */
+                border: 1px solid #eb2626ff; /* couleur bordure*/
+                padding: 10px;   /* espace entre la boite et le texte*/
+                border-radius: 5px; /* arrondi coin */
+                box-shadow: 0 0 5px rgba(116, 24, 24, 0.1); /* couleur ombre*/
+                background-color: #06ddb9ff;   /* couleur boite */
+                transition: transform 0.2s; /* temps de l'animation du mouseover */
+                order : 50;
+              
+}
+
+.stylegrilleinter.vert { background-color: #10b93dff; order : 10;} 
+.stylegrilleinter.jaune { background-color: #ddcf06; order : 15; }
+.stylegrilleinter.rouge { background-color: #dd0606; order : 20; }
+.stylegrilleinter.base  { background-color: #06ddb9ff; order : 50; }
+
+.stylegrilleinter:hover {
+    transform: translateY(-5px);
+
+}
+
+#rechercheboisson {
+    
+    max-height: 60px;
+    transition: max-height 0.3s ease;
+}
+
+
+
+.stylegrilleboissons {
+    overflow-y: auto;  /* scroll si plus de 4 cases */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+    margin-top: 10px;
+}
+
+.stylegrilleinterboissons.vert { background-color: #10b93dff; } 
+.stylegrilleinterboissons.orange { background-color: #f0ad10; }
+.stylegrilleinterboissons.jaune { background-color: #ddcf06; }
+.stylegrilleinterboissons.rouge { background-color: #dd0606; }
+
+.stylegrilleinterboissons {
+                display: flex;     /* flex pour pouvoir gerer la case plus facilement */
+                flex-direction: column; 
+                justify-content: center;   /* centrage vertical */
+                align-items: center;       /* centrage horizontal */
+                height: 50px;             /* hauteur d'une boite */
+                border: 1px solid #dd0606; /* couleur bordure*/
+                padding: 10px;   /* espace entre la boite et le texte*/
+                border-radius: 5px; /* arrondi coin */
+                box-shadow: 0 0 5px rgba(116, 24, 24, 0.1); /* couleur ombre*/
+                background-color: #10b93dff;   /* couleur boite */
+                transition: transform 0.2s, /* temps de l'animation du mouseover */
+}
+
+.stylegrilleinterboissons:hover {
+    transform: translateY(-5px);
+}
+
+#conteneurPrincipal {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    height: 100%;
+    align-items: flex-start; }
+
+#conteneurBoissons {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+}
+
+#conteneurAliments {
+    flex: 1; 
+    display: flex;
+    flex-direction: column;
+    padding-left: 5px;
+    height: 100%;
+}
+
+
+
+
+#bouttonRechercheAlim,
+#bouttonReset {
+    flex: 1;           
+    padding: 10px;
+    border: none;       
+    background-color: black;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+
+
+
+
