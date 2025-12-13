@@ -1,5 +1,7 @@
 <?php
-include 'connect_db.php';
+
+session_start();
+require_once("connect_db.php");
 
 // recuper les données des tables et le met dans des tableaux
 
