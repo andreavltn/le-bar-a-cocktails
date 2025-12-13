@@ -30,44 +30,89 @@ while ($alim = mysqli_fetch_assoc($recette)) $contenu_recette [] = $alim;
 
 <!DOCTYPE html>
 <html lang="fr">
+
+
 <head>
-<meta charset="UTF-8">
-<title>Recherche</title>
-
+    <meta charset="UTF-8">
+    <title>Recette - Le bar à cocktails</title>
+    <link rel="shortcut icon" href="images/logo-site.png">
+    <link rel="stylesheet" href="css/accueil.css">
+    <link rel="stylesheet" href="css/recherche.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
+
 <body>
+    <header class="banniere">
+        <div class="banniere-bloc-gauche">
+            <a href="accueil.php"><img src="images/logo-site.png" alt="logo-site.png"></a>
+        </div>
 
-<h2>Recherche d'aliments</h2>
+        <div class="banniere-bloc-milieu">
+            <li><a href="accueil.php">Accueil du site</a></li>
+            <li><a href="recherche.php">Rechercher une recette</a></li>
+            <li><a href="#">Consulter les favoris</a></li>
+            <?php
+                // si on est connecté, affiche le bouton de déconnexion
+                if (isset($_SESSION["pseudo"])) {
+                    echo "<li><button class='bouton-deconnexion' onclick='confirmerDeconnexion()'>Se déconnecter</button></li>";
+                }
+            ?>
+        </div>
+
+        <div class="banniere-bloc-droite">
+            <img src="images/logo-compte.png" alt="logo-compte.png">
+            <?php
+                // si on est connecté, affiche le pseudo
+                if (isset($_SESSION["pseudo"])) {
+                    echo "<span>" . $_SESSION["pseudo"] . "</span>";
+                } else {
+                    // sinon affiche "Connexion" qui renvoie vers la page de login
+                    echo "<a href='account/login.php'>Connexion</a>";
+                }
+            ?>
+        </div>
+    </header>
 
 
- <!-- barre de recherche des aliments -->
 
-<input type="text" id="rechercheAliment" class="form-control  rechercheAliment" list="aliments" placeholder="Rechercher un aliment...">  
-<datalist id="aliments">
-    <?php foreach ($aliments as $a): ?>
-        <option value="<?= htmlspecialchars($a['nom']) ?>"></option>
-    <?php endforeach ?>
-</datalist>
-<button id="bouttonRechercheAlim" style="padding:6px 12px;cursor:pointer;">
-        Rechercher
-    </button>
 
-<div id="GrilleAliments" class="stylegrille"></div>
+<div id="conteneurPrincipal" style="display: flex; gap: 20px; width: 100%;">
 
-<div id="affichageMenuAliments" style="display:flex;align-items:center;cursor:pointer;">
-    <h3 id="texteFleche">Masquer</h3>
-    <span id="fleche" style="margin-left:10px;transition:.3s;">&#9650;</span>
+
+
+    <!-- Menu aliments -->
+    <div id="conteneurAliments">
+        <h2>Filtrer Aliments</h2>
+
+        <input type="text" id="rechercheAliment" class="form-control rechercheAliment" list="aliments" placeholder="Rechercher un aliment...">  
+        <datalist id="aliments">
+            <?php foreach ($aliments as $a): ?>
+                <option value="<?= htmlspecialchars($a['nom']) ?>"></option>
+            <?php endforeach ?>
+        </datalist>
+
+        <div style="display: flex; gap: 2px; margin: 2px 2px;">
+            <button id="bouttonRechercheAlim">Rechercher</button>
+            <button id="bouttonReset">Reset</button>
+        </div>
+
+        <div id="GrilleAliments" class="stylegrille"></div>
+    </div>
+
+
+
+
+    <!-- Partie boissons (2/3 de la largeur) -->
+    <div id="conteneurBoissons">
+        <h2>Affichage boissons</h2>
+        <div id="GrilleBoissons" class="stylegrilleboissons"></div>
+
+                
+
+    </div>
+
+
 </div>
-
-<hr>
-
-<h2>Affichage boissons</h2>
-
-
-
-<div id="GrilleBoissons" class="stylegrilleboissons"></div>
-
-
 
 <script>
 // convertit les resultats des select pour js //
@@ -77,6 +122,9 @@ const hierarchie = <?= json_encode($hierarchie) ?>;   // >> id_aliment, id_sous_
 const recette = <?= json_encode($contenu_recette) ?>;  // >> id_recette, id_ingredient //
 
 const recetteMap = new Map();     //crée la map id_recette >> liste ingredients
+const hierarchiemap = new Map();     //crée la map id_ingredient >> liste sous ingredients
+
+
 
 recette.forEach(rec => {
     if (!recetteMap.has(rec.id_recette)) {
@@ -85,7 +133,7 @@ recette.forEach(rec => {
     recetteMap.get(rec.id_recette).push(rec.id_ingredient); 
 });
 
-const hierarchiemap = new Map();     //crée la map id_ingredient >> liste sous ingredients
+
 
 hierarchie.forEach(ingr => {
     if (!hierarchiemap.has(ingr.id_aliment)) {
@@ -97,70 +145,142 @@ hierarchie.forEach(ingr => {
 
 
 
+let superalimentsSelect= new Map();       // Map des Super alim Selectionnés super id alim -> sous id alim
+let sousalimentsSelect= [];              //tableau des sous aliments selectionés via les super aliments
 
-let alimentsSelect= [];
-let  alimentsInterdit= [];
-let superalimentsSelect= new Map();
-let sousalimentsSelect=[];
-let sousalimentsNettoyage=[];
+let superalimentsInterdits= new Map();     // Map des Super alim Interdits super id alim -> sous id alim
+let sousalimentsInterdits= [];           //tableau des sous aliments Interdits via les super aliments interdts
 
-function afficherGrille(data, domId, type = "aliment") {
-    const container = document.getElementById(domId);
+let alimentsSelect= new Set();        //liste des aliments directement selectionés
+let alimentsInterdit= new Set();      //liste des aliments directement interdits
+
+
+let sousalimentsNettoyage= new Set();           //liste des sous aliments a mettre a jours
+let sousalimentsInterditsNettoyage= new Set();  //liste des sous aliments a mettre a jours 
+
+
+
+
+
+
+function afficherGrilleAliments(ali, idgrille) {             // Affiche la grille contenant les aliments et ajoute tous les aliments dedans
+    const container = document.getElementById(idgrille);
     container.innerHTML = "";
+    ali.forEach(aliment => {
+        const div = document.createElement("div");
+        div.className =  "stylegrilleinter";
+        div.id = "alim-" + aliment.id_aliment;
+        div.dataset.id_aliment = aliment.id_aliment;
+        div.innerHTML = `<strong>${aliment.nom }</strong>`;
+        div.onclick = () => {
+            sousaliments(div.dataset.id_aliment);                                     // lance la fonction qui met l'aliment dans la liste voulue
+            calculerScoresTableau();                                  // Calcule le score pour toutes les recettes
+            rafraichirAffichageAliments(div.id);                      // modifie la couleur et l'ordre des cases
+            };
+        container.appendChild(div);
+        });  
+}
+
+
+//Fonction qui change la couleur d"une case aliment si on clic dessus , change egalement les cases dependantes
+
+function rafraichirAffichageAliments(Grilleid) {
+    const grillea = document.getElementById(Grilleid);             //recupere la case
+    if (!grillea) return;
+
+    const idAlim = grillea.dataset.id_aliment;             //recupere l'id de l'aliment
+
+
+    //parcours des aliments à recolorer
+    sousalimentsNettoyage.forEach(id => {
+
+        const sousalim = document.getElementById("alim-"+id); 
+
+        //Test si une case jaune doit etre recolorés
+        if (sousalim && sousalim.classList.contains("jaune")) { 
+            sousalim.classList.remove("jaune");
+            sousalim.classList.add("base"); }
+        sousalimentsNettoyage.delete(id); });
+                 
+    //parcours des aliments à recolorer
+    sousalimentsInterditsNettoyage.forEach(id => { 
+        const sousalim = document.getElementById("alim-"+id);
+        //Test si une case rouge doit etre recolorés
+        if (sousalim && sousalim.classList.contains("rouge") && !superalimentsInterdits.has(sousalim.id) && !alimentsInterdit.has(sousalim.id)) { 
+            sousalim.classList.remove("rouge");
+            sousalim.classList.add("base"); }
+        sousalimentsInterditsNettoyage.delete(id); });
+
 
     
-    data.forEach(item => {
-        const div = document.createElement("div");
-        div.className = type === "aliment" ? "stylegrilleinter" : "stylegrilleinterboissons";
-        div.id = item.id_aliment || item.id_recette;
-        div.innerHTML = `<strong>${item.nom || item.titre}</strong>`;
-        div.style.order = 50;
-        if (type === "aliment") {
-            div.onclick = () => {
-                sousaliments(div.id);
-                calculerScoresTableau(alimentsSelect, alimentsInterdit);
-       //         filtrerBoissons(alimentsSelect, alimentsInterdit);
+    //Reset de la couleur de la case cliqué        
+    grillea.classList.remove("vert", "jaune", "base", "rouge");
 
 
-                if (alimentsSelect.includes(div.id)) {
-                    div.classList.add("selected");
-                    div.style.order = 10; 
-                
-                } 
-                else if (alimentsInterdit.includes(div.id)) {
-                    div.classList.remove("selected");
-                    div.classList.add("interdit");
-                    div.style.order = 20; 
-                } 
-                else if (superalimentsSelect.has(div.id)) {
-                    div.classList.add("selected");
-                    div.style.order = 5; 
+    //check si la case est un super aliment et change ses sous aliment en plus
+    if (superalimentsSelect.has(idAlim)) {
+        grillea.classList.add("vert"); 
 
-                    // Parcours des sous-aliments
-                    superalimentsSelect.get(div.id).forEach(val => {
-                        let sousDiv = document.getElementById(val);
-                        if (sousDiv) {
-                            sousDiv.classList.add("superalim");
-                            sousDiv.style.order = 30; 
-                        }
-                    });
-                } 
-                else {
-                    div.classList.remove("interdit");
-                    div.classList.remove("selected");
-                    while (sousalimentsNettoyage.length > 0) {
-                        let sousalim = document.getElementById(sousalimentsNettoyage.shift());
-                        if (sousalim) {
-                         sousalim.classList.remove("superalim");
-                        sousalim.style.order = 50; }}
-                   div.style.order = 50; 
+        superalimentsSelect.get(idAlim).forEach(val => {
+            let sousal = document.getElementById("alim-"+val);
+                if (sousal && !sousal.classList.contains("vert")) {
+                    sousal.classList.remove("vert", "jaune", "base", "rouge");
+                    sousal.classList.add("jaune"); 
                 }
-            };
-        }
+            });
+        return;
+    } 
 
-        container.appendChild(div);
+    //check si la case est un super aliment et change ses sous aliment en plus
+    if (superalimentsInterdits.has(idAlim)) {
+        grillea.classList.add("rouge"); 
+
+        superalimentsInterdits.get(idAlim).forEach(val => {
+            let sousal = document.getElementById("alim-"+val);
+            if (sousal && !sousal.classList.contains("vert")&& !sousal.classList.contains("jaune")) {
+                sousal.classList.remove("vert", "jaune", "base", "rouge");
+                sousal.classList.add("rouge"); 
+                }
+            });
+        return;
+    }
+
+    //check si la case est un aliment interdit
+    if (alimentsInterdit.has(idAlim)) {
+        grillea.classList.add("rouge"); 
+    return;
+    }
+    //check si la case est un aliment selectioné
+    if (alimentsSelect.has(idAlim)) {
+        grillea.classList.add("vert"); 
+        return;
+    } 
+                
+    grillea.classList.add("base");
+        
+
+}
+
+
+
+
+function afficherGrilleBoissons(rct, grilleboi) {
+    const grille = document.getElementById(grilleboi);
+    grille.innerHTML = "";
+    rct.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "stylegrilleinterboissons";
+        div.id = item.id_recette;
+        div.innerHTML = `<strong>${item.titre}</strong>`;
+        div.style.order = 50;
+        div.onclick = () => {
+            window.location.href = "recette.php?id=" + item.id_recette;
+        };
+
+        grille.appendChild(div); 
     });
 }
+
 
 // Filtre les aliments afficher en fonction de la barre de recherche
 function filtrerAliments() {
@@ -175,7 +295,7 @@ function filtrerAliments() {
     const container = document.getElementById("GrilleAliments");
     const divs = Array.from(container.children);
     divs.forEach(div => {
-        if (!resultat.some(item => item.id_aliment == div.id)) {
+        if (!resultat.some(item => item.id_aliment == div.dataset.id_aliment)) {
             div.style.display = "none"; // masquer
         } else {
             div.style.display = "flex"; 
@@ -189,30 +309,26 @@ function filtrerAliments() {
 
 //crée les tableaux des aliments selectionés
 function ajouterAlimentSelect(id) {
-  if (alimentsSelect.includes(id)) {
-    alimentsSelect = alimentsSelect.filter(idalim => idalim !== id);
-    alimentsInterdit.push(id);
+  if (alimentsSelect.has(id)) {
+    alimentsSelect.delete(id);
+    alimentsInterdit.add(id);
   } 
-   else if (alimentsInterdit.includes(id)) {
-    alimentsInterdit = alimentsInterdit.filter(idalim => idalim !== id);
+   else if (alimentsInterdit.has(id)) {
+    alimentsInterdit.delete(id);
   }
   else {
-    alimentsSelect.push(id);
-    console.log(alimentsSelect);
+    alimentsSelect.add(id);
   }
 }
 
 
 function recupSousalim(id){
     const result = [];
-
     function boucle(key) {
         const children =  hierarchiemap.get(key);
-  
         if (!children) return;
-            
         for (const child of children) {
-                 result.push(child);
+            result.push(child);
             boucle(child); // descendre dans la hiérarchie
         }
     }
@@ -223,90 +339,86 @@ return result;
 
 
 function ajouterSuperAlimentSelect(id) {
-    let sousalim = [...recupSousalim(id).map(String)]
-    if (!superalimentsSelect.has(id)) {
+    let sousalim = [...recupSousalim(id)]
+    if (!superalimentsSelect.has(id) && !superalimentsInterdits.has(id)) {
 
        superalimentsSelect.set(id,sousalim);
        sousalimentsSelect.push(...sousalim);
-
-       
     }
-    else{
+    else if (superalimentsSelect.has(id)) {
+
+        superalimentsInterdits.set(id,sousalim);
+        sousalimentsInterdits.push(...sousalim);
         superalimentsSelect.delete(id);
+
         sousalim.forEach(val => {
             let index = sousalimentsSelect.indexOf(val);
             if (index !== -1) {
                 sousalimentsSelect.splice(index, 1);
             }
-            index = sousalimentsSelect.indexOf(val);
-            if (index == -1) {
-            sousalimentsNettoyage.push(val);}
+            if (!sousalimentsSelect.includes(val)) {
+            sousalimentsNettoyage.add(val);}
+
+        });
+    }
+    else{
+        superalimentsInterdits.delete(id);
+        sousalim.forEach(val => {
+            let index = sousalimentsInterdits.indexOf(val);
+            if (index !== -1) {
+                sousalimentsInterdits.splice(index, 1);
+            }
+            if (!sousalimentsInterdits.includes(val)) {
+                sousalimentsInterditsNettoyage.add(val);}
 
         });
 }
-}
 
-
-
-
-    //affiche les boissons selon le filtre aliments
-function filtrerBoissons(idIngredientsSelectionnes, alimentsInterdits) {
-
-    // pour les ou
-
-    // pour les et
-
-
-  let resultat = boissons.filter(b => idIngredientsSelectionnes.every(id => (recetteMap.get(b.id_recette).includes(id))));
-    resultat = resultat.filter(b => !recetteMap.get(b.id_recette).some(id => alimentsInterdits.includes(id)));
-
-
-    resultat = resultat.filter(b => {
-    const ingredients = recetteMap.get(b.id_recette);
-    return Array.from(superalimentsSelect.values()).every(sousAlimGroup => {      // concatenation des ou
-        return sousAlimGroup.some(val => ingredients.includes(val));             // true si la recette contient ou moins 1 alim
-    });
-});
-    // Afficher dans la grille
-    afficherGrille(resultat, "GrilleBoissons", "boisson");
 }
 
 
 
 
 
-    //affiche les boissons selon le filtre aliments
-function calculerScoresTableau(idIngredientsSelectionnes, alimentsInterdits) {
+// Calcule le score d'une boisson selon les ingredients
+function calculerScoresTableau() {
     const scores = [];
-
+    let score;
+    let total;
     boissons.forEach(b => {
-        const ingredients = recetteMap.get(b.id_recette);
-        let score = 0;
-        let total = 0;
 
-        // Score pour ingrédients sélectionnés (ET)
-        idIngredientsSelectionnes.forEach(id => {
-            if (ingredients.includes(id)) {score += 1;
-            }
-                          total += 1;
-        });
+        const ingredients =  new Set(recetteMap.get(b.id_recette));  // liste des ingredients pour la recette b
+        // pour calculer le pourcentage
+        score = 0;
+        total = 0;
 
-        // Pénalité pour aliments interdits
-        alimentsInterdits.forEach(id => {
-            if (!ingredients.includes(id)) {score += 1;
-            
-            }
-                          total += 1;
 
-        });
+        // augmente le score si un aliment selection est dans la recette
+        alimentsSelect.forEach(id => {
+            if (ingredients.has(id)) 
+                {score ++;}
+            total ++;});
 
-        // Score pour superalimentsSelect (OU)
-        Array.from(superalimentsSelect.values()).forEach(sousAlimGroup => {
-            if (sousAlimGroup.some(val => ingredients.includes(val))) {
-                score += 1;
-            }
-                          total += 1;
-        });
+         // augmente le score si un aliment interdit  n'est pas dans la recette
+        alimentsInterdit.forEach(id => {
+            if (!ingredients.has(id)) 
+                {score ++;}
+            total ++;});
+
+
+        //augmente le score si un des sous aliment est  dans la recette
+        Array.from(superalimentsSelect.values()).forEach(sousAlim => {
+            if (sousAlim.some(ingr => ingredients.has(ingr))) {
+                score ++;}
+            total ++;});
+
+        //diminue le score si un sous aliment interdits est dans la recette
+        Array.from(superalimentsInterdits.values()).forEach(sousAlim => {
+            if (sousAlim.some(ingr => ingredients.has(ingr))) {
+                total +=1;}
+            });
+
+
 
         if (total == 0){
             score = 100;
@@ -322,29 +434,28 @@ function calculerScoresTableau(idIngredientsSelectionnes, alimentsInterdits) {
     scores.sort((a, b) => b.score - a.score);
     
     
-   afficherGrille(scores, "GrilleBoissons", "boisson");
+    afficherGrilleBoissons(scores, "GrilleBoissons");
     const container = document.getElementById("GrilleBoissons");
     const divs = Array.from(container.children);
 
 divs.forEach(div => {
     
     const item = scores.find(i => i.id_recette == div.id);
-    if (!item) return; // sécurité
+    if (!item) return; 
+    div.classList.remove("vert", "jaune", "orange", "rouge");
 
-    if (item.score >= 100) {
-        div.style.backgroundColor = "#14dd06"; // vert pour score élevé
-    } else if (item.score >= 50) {
-        div.style.backgroundColor = "#c4b213"; // jaune pour score moyen
-    } else {
-        div.style.backgroundColor = "#dd0606"; // rouge pour score faible
-    }
+    if (item.score >= 99) div.classList.add("vert");
+    else if (item.score >= 60) div.classList.add("jaune");
+    else if (item.score >= 1) div.classList.add("orange");
+    else div.classList.add("rouge");
+
 });
 
 }
 
 
 
-// differentie les aliments basiques des supeer aliments
+// differentie les aliments basiques des super aliments
 function sousaliments(id) {
     if (hierarchiemap.has(id)) {
         ajouterSuperAlimentSelect(id);
@@ -360,156 +471,23 @@ document.getElementById("bouttonRechercheAlim").onclick = () => {
     filtrerAliments(); 
 };
 
+document.getElementById("bouttonReset").onclick = () => {
+    superalimentsSelect.clear();       
+    superalimentsInterdits.clear();    
+    sousalimentsSelect = [];             
+    sousalimentsInterdits = [];
+    alimentsSelect.clear();        
+    alimentsInterdit.clear();  
+    afficherGrilleAliments(aliments, "GrilleAliments");
+    afficherGrilleBoissons(boissons, "GrilleBoissons");
+};
 
 // Affichage initial (tout)
-afficherGrille(aliments, "GrilleAliments");
-afficherGrille(boissons, "GrilleBoissons");
+afficherGrilleAliments(aliments, "GrilleAliments");
+afficherGrilleBoissons(boissons, "GrilleBoissons");
 
-// ---------------------- Gestion Masquer / Afficher -------------------------
-function afficherMenu(){
-    const btn = document.getElementById("affichageMenuAliments");
-    const grille = document.getElementById("GrilleAliments");
-    const texte = document.getElementById("texteFleche");
-    const fleche = document.getElementById("fleche");
-    const recherche = document.getElementById("rechercheAliment");
-    const bouton = document.getElementById("bouttonRechercheAlim");
-    btn.onclick = () => {
-        grille.classList.toggle("cache");
-        recherche.classList.toggle("cache");
-        bouton.classList.toggle("cache");
 
-        if(grille.classList.contains("cache")){
-            texte.textContent = "Afficher";
-            fleche.style.transform = "rotate(180deg)";
-        } else {
-            texte.textContent = "Masquer";
-            fleche.style.transform = "rotate(0deg)";
-        }
-    }
-}
-
-afficherMenu();
 </script>
-
-
-
-
-
-<style>
-
-#rechercheAliment {
-    
-    max-height: 60px;
-    transition: all 0.3s ease;
-}
-
-#rechercheAliment.cache {
-    
-    display:none;
-}
-#bouttonRechercheAlim.cache {
-    
-    display:none;
-}
-
-.stylegrille {
-    max-height: 280px; /* hauteur approximative de 4 cases de 50px + gap */
-    overflow-y: auto;  /* scroll si plus de 4 cases */
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 16px;
-    margin-top: 10px;
-    transition: max-height 0.3s ease;  /* temps de la transi entre les 2 max height */
-}
-
-.stylegrille.cache {
-    max-height: 0;
-    overflow: hidden;   /*cache ce qui depasse*/
-}
-
-.stylegrilleinter {
-                display: flex;     /* flex pour pouvoir gerer la case plus facilement */
-                flex-direction: column; 
-                justify-content: center;   /* centrage vertical */
-                align-items: center;       /* centrage horizontal */
-                height: 50px;             /* hauteur d'une boite */
-                border: 1px solid #eb2626ff; /* couleur bordure*/
-                padding: 10px;   /* espace entre la boite et le texte*/
-                border-radius: 5px; /* arrondi coin */
-                box-shadow: 0 0 5px rgba(116, 24, 24, 0.1); /* couleur ombre*/
-                background-color: #06ddb9ff;   /* couleur boite */
-                transition: transform 0.2s, background-color 0.2s; /* temps de l'animation du mouseover */
-}
-
-.stylegrilleinter.selected {
-    background-color: #14dd06ff;
-}
-.stylegrilleinter.interdit {
-    background-color: #dd0606ff;
-}
-
-.stylegrilleinter.superalim {
-    background-color: #c4b213ff;
-}
-
-.stylegrilleinter:hover {
-    transform: translateY(-5px);
-    background-color: #633ed2ff;
-
-}
-
-#rechercheboisson {
-    
-    max-height: 60px;
-    transition: max-height 0.3s ease;
-}
-
-#rechercheboisson.cache {
-    
-    max-height: 0;
-    overflow: hidden;
-}
-
-
-.stylegrilleboissons {
-    max-height: 500px; /* hauteur approximative de 4 cases de 50px + gap */
-    overflow-y: auto;  /* scroll si plus de 4 cases */
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 16px;
-    margin-top: 10px;
-    transition: max-height 0.3s ease;  /* temps de la transi entre les 2 max height */
-}
-
-.stylegrilleboissons.cache {
-    max-height: 0;
-    overflow: hidden;   /*cache ce qui depasse*/
-}
-
-.stylegrilleinterboissons {
-                display: flex;     /* flex pour pouvoir gerer la case plus facilement */
-                flex-direction: column; 
-                justify-content: center;   /* centrage vertical */
-                align-items: center;       /* centrage horizontal */
-                height: 50px;             /* hauteur d'une boite */
-                border: 1px solid #eb2626ff; /* couleur bordure*/
-                padding: 10px;   /* espace entre la boite et le texte*/
-                border-radius: 5px; /* arrondi coin */
-                box-shadow: 0 0 5px rgba(116, 24, 24, 0.1); /* couleur ombre*/
-                background-color: #06ddb9ff;   /* couleur boite */
-                transition: transform 0.2s, background-color 0.2s; /* temps de l'animation du mouseover */
-}
-
-.stylegrilleinterboissons:hover {
-    transform: translateY(-5px);
-    background-color: #633ed2ff;
-}
-
-</style>
-
-
-
-
 
 </body>
 </html>
