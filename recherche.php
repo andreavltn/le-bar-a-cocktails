@@ -76,13 +76,13 @@ while ($alim = mysqli_fetch_assoc($recette)) $contenu_recette [] = $alim;
 
 
 
-<div id="conteneurPrincipal" style="display: flex; gap: 20px; width: 100%;">
+<div id="conteneurPrincipal">
 
 
 
     <!-- Menu aliments -->
     <div id="conteneurAliments">
-        <h2>Filtrer Aliments</h2>
+        <h2 style="text-align: center;">Personnalisez votre recette !</h2>
 
         <input type="text" id="rechercheAliment" class="form-control rechercheAliment" list="aliments" placeholder="Rechercher un aliment...">  
         <datalist id="aliments">
@@ -100,11 +100,8 @@ while ($alim = mysqli_fetch_assoc($recette)) $contenu_recette [] = $alim;
     </div>
 
 
-
-
-    <!-- Partie boissons (2/3 de la largeur) -->
     <div id="conteneurBoissons">
-        <h2>Affichage boissons</h2>
+        <h2 style="text-align: center;">Trouvez celle qui vous convient</h2>
         <div id="GrilleBoissons" class="stylegrilleboissons"></div>
 
                 
@@ -206,15 +203,15 @@ function rafraichirAffichageAliments(Grilleid) {
     sousalimentsInterditsNettoyage.forEach(id => { 
         const sousalim = document.getElementById("alim-"+id);
         //Test si une case rouge doit etre recolorés
-        if (sousalim && sousalim.classList.contains("rouge") && !superalimentsInterdits.has(sousalim.id) && !alimentsInterdit.has(sousalim.id)) { 
-            sousalim.classList.remove("rouge");
+        if (sousalim && sousalim.classList.contains("rougesa") ) { 
+            sousalim.classList.remove("rougesa");
             sousalim.classList.add("base"); }
         sousalimentsInterditsNettoyage.delete(id); });
 
 
     
     //Reset de la couleur de la case cliqué        
-    grillea.classList.remove("vert", "jaune", "base", "rouge");
+    grillea.classList.remove("vert", "jaune", "base", "rouge","rougesa");
 
 
     //check si la case est un super aliment et change ses sous aliment en plus
@@ -224,7 +221,7 @@ function rafraichirAffichageAliments(Grilleid) {
         superalimentsSelect.get(idAlim).forEach(val => {
             let sousal = document.getElementById("alim-"+val);
                 if (sousal && !sousal.classList.contains("vert")) {
-                    sousal.classList.remove("vert", "jaune", "base", "rouge");
+                    sousal.classList.remove("vert", "jaune", "base", "rouge","rougesa");
                     sousal.classList.add("jaune"); 
                 }
             });
@@ -237,9 +234,9 @@ function rafraichirAffichageAliments(Grilleid) {
 
         superalimentsInterdits.get(idAlim).forEach(val => {
             let sousal = document.getElementById("alim-"+val);
-            if (sousal && !sousal.classList.contains("vert")&& !sousal.classList.contains("jaune")) {
+            if (sousal && !sousal.classList.contains("vert")&& !sousal.classList.contains("jaune")&& !sousal.classList.contains("rouge")) {
                 sousal.classList.remove("vert", "jaune", "base", "rouge");
-                sousal.classList.add("rouge"); 
+                sousal.classList.add("rougesa"); 
                 }
             });
         return;
@@ -255,7 +252,14 @@ function rafraichirAffichageAliments(Grilleid) {
         grillea.classList.add("vert"); 
         return;
     } 
-                
+    if (sousalimentsSelect.includes(idAlim)) {
+        grillea.classList.add("jaune"); 
+        return;
+    }    
+    if (sousalimentsInterdits.includes(idAlim)) {
+        grillea.classList.add("rougesa"); 
+        return;
+    }            
     grillea.classList.add("base");
         
 
@@ -442,12 +446,19 @@ divs.forEach(div => {
     
     const item = scores.find(i => i.id_recette == div.id);
     if (!item) return; 
+    const span = document.createElement("span");
+    span.classList.add("texte-pourcent");
+    span.textContent = Math.round(item.score) + "%";
+    div.appendChild(span);
+
     div.classList.remove("vert", "jaune", "orange", "rouge");
 
     if (item.score >= 99) div.classList.add("vert");
     else if (item.score >= 60) div.classList.add("jaune");
     else if (item.score >= 1) div.classList.add("orange");
     else div.classList.add("rouge");
+
+
 
 });
 
