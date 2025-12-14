@@ -25,7 +25,7 @@
         <div class="banniere-bloc-milieu">
             <li><a href="accueil.php">Accueil du site</a></li>
             <li><a href="recherche.php">Rechercher une recette</a></li>
-            <li><a href="#">Consulter les favoris</a></li>
+            <li><a href="favoris.php">Consulter les favoris</a></li>
             <?php
                 // si on est connecté, affiche le bouton de déconnexion
                 if (isset($_SESSION["pseudo"])) {
@@ -50,7 +50,7 @@
 
     <section class="contenu">
         <div class="bloc-retour">
-            <a href="recherche.php">← Retour</a>
+            <a href="javascript:history.back()">← Retour</a>
         </div>
 
         <div class="bloc-recette">
@@ -88,7 +88,7 @@
                     // si des recettes sont trouvées
                     if ($recette = mysqli_fetch_assoc($resultat)) {
 
-                        echo '<div class="recette-container">';
+                       echo '<div class="recette-container" onclick="window.location.href=\'recette.php?id=' . $recette['id_recette'] . '\'">';
 
                         // ------------------- IMAGE -------------------
 
