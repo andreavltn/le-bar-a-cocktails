@@ -51,8 +51,8 @@ while ($alim = mysqli_fetch_assoc($recette)) $contenu_recette [] = $alim;
 
         <div class="banniere-bloc-milieu">
             <li><a href="accueil.php">Accueil du site</a></li>
-            <li><a href="recherche.php">Rechercher une recette</a></li>
-            <li><a href="#">Consulter les favoris</a></li>
+            <li class ="page-en-cours">Rechercher une recette</a></li>
+            <li><a href="favoris.php">Consulter les favoris</a></li>
             <?php
                 // si on est connecté, affiche le bouton de déconnexion
                 if (isset($_SESSION["pseudo"])) {
@@ -75,7 +75,15 @@ while ($alim = mysqli_fetch_assoc($recette)) $contenu_recette [] = $alim;
         </div>
     </header>
 
-
+    <script>
+        // fonction qui affiche un pop up pour valider la déconnexion
+        function confirmerDeconnexion() {
+            if (confirm('Souhaitez vous vraiment vous déconnecter ?')) {
+                // redirection vers la page de déconnexion
+                window.location.href = 'account/logout.php';
+            }
+        }
+    </script>
 
 
 <div id="conteneurPrincipal">
@@ -226,7 +234,10 @@ function rafraichirAffichageAliments(Grilleid) {
         //Test si une case rouge doit etre recolorés
         if (sousalim && sousalim.classList.contains("rougesa") ) { 
             sousalim.classList.remove("rougesa");
-            sousalim.classList.add("base"); }
+            if (sousalimentsSelect.includes(id)) {
+                sousalim.classList.add("jaune"); 
+                }    
+             else { sousalim.classList.add("base");} }
         sousalimentsInterditsNettoyage.delete(id); });
     
     //Reset de la couleur de la case cliqué        
@@ -239,6 +250,7 @@ function rafraichirAffichageAliments(Grilleid) {
             let sousal = document.getElementById("alim-"+val);
                 if (sousal && !sousal.classList.contains("vert")) {
                     sousal.classList.remove("vert", "jaune", "base", "rouge","rougesa");
+                    
                     sousal.classList.add("jaune"); 
                 }
             });
@@ -251,7 +263,7 @@ function rafraichirAffichageAliments(Grilleid) {
 
         superalimentsInterdits.get(idAlim).forEach(val => {
             let sousal = document.getElementById("alim-"+val);
-            if (sousal && !sousal.classList.contains("vert")&& !sousal.classList.contains("jaune")&& !sousal.classList.contains("rouge")) {
+            if (sousal && !sousal.classList.contains("vert")&& !sousal.classList.contains("rouge")) {
                 sousal.classList.remove("vert", "jaune", "base", "rouge");
                 sousal.classList.add("rougesa"); 
                 }
