@@ -72,7 +72,9 @@
     font-size: 32px;
     font-weight: 600;
     margin: 0;
-    white-space: nowrap;
+    white-space: normal; /* Permet le retour à la ligne */
+    max-width: 90%;      /* Limite la largeur du titre */
+    word-break: break-word; /* Coupe les mots trop longs si besoin */
 }
 
 .image-like,
@@ -85,6 +87,7 @@
 
 /* Section de la recette */
 .recette-section {
+    margin-top: 20px;
     margin-bottom: 30px;
 }
 
