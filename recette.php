@@ -50,7 +50,7 @@
 
     <section class="contenu">
         <div class="bloc-retour">
-            <a href="javascript:history.back()">← Retour</a>
+            <a href="javascript:history.back()">← Retour</a> 
         </div>
 
         <div class="bloc-recette">
@@ -90,7 +90,7 @@
                     // si des recettes sont trouvées
                     if ($recette = mysqli_fetch_assoc($resultat)) {
 
-                       echo '<div class="recette-container" onclick="window.location.href=\'recette.php?id=' . $recette['id_recette'] . '\'">';
+                       echo '<div class="recette-container">';
 
                         // ------------------- IMAGE -------------------
 
@@ -122,10 +122,7 @@
 
                         // ------------------- TITRE ET BOUTON LIKE -------------------
                         
-                        echo '<div class="titre-like-container">';
-                        echo '<h1 class="recette-titre">' . htmlspecialchars($recette['titre']) . '</h1>';
-                        
-                        // variable a true si la recet
+                        // variable a true si la recette est déjà dans les favoris
                         $estFavori = false;
 
                         // si on est connecté
@@ -153,20 +150,24 @@
                             }
                         }
                         
-                        // si la recette est en favoris
+                        // si la recette est en favoris avant le clic
                         if($estFavori) {
-                            $classe_like = 'bouton-like actif'; // passe en actif (ajout d'une classe)
-                            $texte_like = 'Supprimer des favoris';
-                        } else {
-                            $classe_like = 'bouton-like'; // sinon il reste bouton-like
-                            $texte_like = 'Ajouter aux favoris';
+                            $classe_like = 'image-like actif'; // passe en actif (ajout d'une classe)
+                            $texte_like = 'Supprimer des favoris'; // change le texte au survol (suppression)
+                            $image_like = 'images/logo-etoile-jaune.png'; // change le logo (étoile jaune)
+                        } else { // sinon elle n'est pas en favori
+                            $classe_like = 'image-like'; // sinon il reste bouton-like
+                            $texte_like = 'Ajouter aux favoris'; // change le texte au survol (ajout)
+                            $image_like = 'images/logo-etoile-blanc.png'; // change le logo (étoile blanche)
                         }
 
-                        // ajout du bouton et maj en fonction de l'état favori ou non
-                        echo '<button class="' . $classe_like . '" onclick="liker(event)" title="'. $texte_like .'">';
-                        echo '<span class="icone-like">♥</span>';
-                        echo '</button>';
-                        echo '</div>';
+                        echo "<div class='titre-like'>
+                                <h1 class='recette-titre'>" . htmlspecialchars($recette['titre']) . "</h1>
+                                <img src='" . $image_like . "'
+                                    class='" . $classe_like . "'
+                                    onclick='liker(event)'
+                                    title='" . $texte_like . "'>
+                            </div>";
 
                         // ------------------- INGREDIENTS -------------------
                         
@@ -273,30 +274,37 @@
             }
         }
 
-        // fonction pour gérer l'ajout/suppression d'un favori sur la page
+        // fonction appelée au clique sur l'étoile (mettre en favori/retirer des favoris une recette) :
         function liker(event) {
 
-            // empêche le clic de remonter sur le conteneur (empêche le rechargement de la page)
-            event.stopPropagation();
+            event.stopPropagation(); // évite la redirection causée par le parent
 
-            // récupère l'élément bouton (celui cliqué)
-            const bouton = event.currentTarget;
-            
-            // devientActif = true si le bouton n'est pas actif
-            const devientActif = !bouton.classList.contains('actif');
+            const img = event.currentTarget; // récupère l'image cliquée
+            const devientActif = !img.classList.contains('actif'); // true si le clic va ajouter aux favoris
 
-            // met à jour la classe + le texte au survol
+            // si le clic va ajouter la recette aux favoris
             if(devientActif){
-                bouton.classList.add('actif');
-                bouton.title = 'Supprimer des favoris';
-            } else {
-                bouton.classList.remove('actif');
-                bouton.title = 'Ajouter aux favoris';
+
+                img.classList.add('actif'); // ajoute la classe actif à l'image
+                img.title = 'Supprimer des favoris'; // change le texte au survol
+                img.src = 'images/logo-etoile-jaune.png'; // change l'image (passe au jaune)
+
+            } else { // sinon le clic va supprimer la recette des favoris
+
+                img.classList.remove('actif'); // retire la classe actif à l'image
+                img.title = 'Ajouter aux favoris'; // change le texte au survol
+                img.src = 'images/logo-etoile-blanc.png'; // change l'image (passe au blanc)
             }
-            
-            // envoie une demande à toggle_favorite_simple.php pour mettre à jour la bdd
-            // avec en paramètre l'id de la recette à ajouter/supprimer des favoris
+
+            // requête à update-favori-like.php pour mettre à jour la bdd/la session en arrière-plan
             fetch('update-favoris-like.php?id=<?php echo $id_recette; ?>');
+
+            // popup de confirmation
+            if(devientActif){
+                alert('La recette a été ajoutée aux favoris!');
+            } else {
+                alert('La recette a été supprimée des favoris!');
+            }
         }
     </script>
 

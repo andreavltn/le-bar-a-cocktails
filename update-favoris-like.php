@@ -27,7 +27,7 @@
         $res_check = mysqli_stmt_get_result($req_check); // récupération du résultat
         
         // si il y a un résultat : la recette est déjà en favoris
-        if (mysqli_num_rows($res_check > 0)) {
+        if (mysqli_num_rows($res_check) > 0) {
             $est_en_fav = true;
         } else {
             $est_en_fav = false;

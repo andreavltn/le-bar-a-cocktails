@@ -1,5 +1,4 @@
-/* Style de la page de recette */
-
+/* Bloc avec le bouton Retour */
 .bloc-retour {
     padding: 20px 0;
     margin-bottom: 20px;
@@ -58,18 +57,30 @@
 .titre-like-container {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 20px;
+    gap: 10px;
     margin-bottom: 30px;
 }
 
 /* Titre de la recette */
+.titre-like {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .recette-titre {
     font-size: 32px;
     font-weight: 600;
-    color: #333;
-    line-height: 1.3;
-    flex: 1;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.image-like,
+.image-like.actif {
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    flex-shrink: 0;
 }
 
 /* Section de la recette */
@@ -162,6 +173,7 @@
     margin-bottom: 30px;
 }
 
+/* Bouton de retour à l'accueil */
 .bouton-retour {
     display: inline-block;
     background-color: #ff6b6b;
@@ -175,50 +187,4 @@
 
 .bouton-retour:hover {
     background-color: #e55555;
-}
-
-/* Bouton like (favori) */
-.bouton-like {
-    appearance: none;
-    background-color: transparent !important;
-    border: 2px solid #ff6b6b;
-    color: #ff6b6b;
-    font-size: 28px;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    padding: 0;
-}
-
-.bouton-like:hover {
-    background-color: #ffe0e0;
-    transform: scale(1.1);
-}
-
-/* quand il est actif (cliqué/recette deja en favoris) */
-.bouton-like.actif {
-    background-color: #ff6b6b;
-    color: #ffffff;
-    border-color: #ff6b6b;
-}
-
-.bouton-like.actif:hover {
-    background-color: #e55555;
-    border-color: #e55555;
-}
-
-.icone-like {
-    display: block;
-    line-height: 1;
-    color: inherit;
-}
-
-.bouton-like.actif .icone-like {
-    color: #ffffff;
 }
