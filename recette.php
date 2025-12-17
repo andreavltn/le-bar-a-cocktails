@@ -55,7 +55,9 @@
 
         <div class="bloc-recette">
             <?php
+            
                 // récupérer l'id de la recette dans l'url, sinon null
+                // cast en int pour éviter les injections
                 if (isset($_GET['id'])) {
                     $id_recette = (int)$_GET['id'];
                 } else {
@@ -118,9 +120,53 @@
 
                         echo '<div class="recette-contenu">';
 
-                        // ------------------- TITRE -------------------
+                        // ------------------- TITRE ET BOUTON LIKE -------------------
                         
+                        echo '<div class="titre-like-container">';
                         echo '<h1 class="recette-titre">' . htmlspecialchars($recette['titre']) . '</h1>';
+                        
+                        // variable a true si la recet
+                        $estFavori = false;
+
+                        // si on est connecté
+                        if (isset($_SESSION["id"])) {
+
+                            // requête pour vérifier si la recette est dans les favoris
+                            $sql_check = "SELECT id_recette FROM favoris WHERE id_recette = ? AND id_user = ?";
+                            $req_check = mysqli_prepare($dblink, $sql_check); // préparation de la requête
+                            mysqli_stmt_bind_param($req_check, "ii", $id_recette, $_SESSION["id"]); // liaison des paramètres (deux entiers)
+                            mysqli_stmt_execute($req_check); // éxécution de la requête
+
+                            // si il y a au moins un résultat, la recette fait partie des favoris de l'utilisateur
+                            if(mysqli_num_rows(mysqli_stmt_get_result($req_check)) > 0) {
+                                $estFavori = true;
+                            }
+
+                            mysqli_stmt_close($req_check); // fermeture de la requête
+                        } else {
+
+                            // sinon on n'est pas connecté
+
+                            // si l'id de la recette est dans les favoris de la session
+                            if(isset($_SESSION['favoris']) && in_array($id_recette, $_SESSION['favoris'])) {
+                                $estFavori = true;
+                            }
+                        }
+                        
+                        // si la recette est en favoris
+                        if($estFavori) {
+                            $classe_like = 'bouton-like actif'; // passe en actif (ajout d'une classe)
+                            $texte_like = 'Supprimer des favoris';
+                        } else {
+                            $classe_like = 'bouton-like'; // sinon il reste bouton-like
+                            $texte_like = 'Ajouter aux favoris';
+                        }
+
+                        // ajout du bouton et maj en fonction de l'état favori ou non
+                        echo '<button class="' . $classe_like . '" onclick="liker(event)" title="'. $texte_like .'">';
+                        echo '<span class="icone-like">♥</span>';
+                        echo '</button>';
+                        echo '</div>';
 
                         // ------------------- INGREDIENTS -------------------
                         
@@ -225,6 +271,32 @@
                 // redirection vers la page de déconnexion
                 window.location.href = 'account/logout.php';
             }
+        }
+
+        // fonction pour gérer l'ajout/suppression d'un favori sur la page
+        function liker(event) {
+
+            // empêche le clic de remonter sur le conteneur (empêche le rechargement de la page)
+            event.stopPropagation();
+
+            // récupère l'élément bouton (celui cliqué)
+            const bouton = event.currentTarget;
+            
+            // devientActif = true si le bouton n'est pas actif
+            const devientActif = !bouton.classList.contains('actif');
+
+            // met à jour la classe + le texte au survol
+            if(devientActif){
+                bouton.classList.add('actif');
+                bouton.title = 'Supprimer des favoris';
+            } else {
+                bouton.classList.remove('actif');
+                bouton.title = 'Ajouter aux favoris';
+            }
+            
+            // envoie une demande à toggle_favorite_simple.php pour mettre à jour la bdd
+            // avec en paramètre l'id de la recette à ajouter/supprimer des favoris
+            fetch('update-favoris-like.php?id=<?php echo $id_recette; ?>');
         }
     </script>
 

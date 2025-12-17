@@ -8,6 +8,9 @@
 
     // connexion à la base de données boissons
     $dblink = mysqli_connect($dbhost, $dbuser, $dbpassword, $dbname); 
+    if (!$dblink) {
+        die("Erreur de connexion : " . mysqli_connect_error());
+    }
 
     // sélection de la base de données boissons
     $db = mysqli_select_db($dblink, $dbname);

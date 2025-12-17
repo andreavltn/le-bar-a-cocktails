@@ -10,7 +10,7 @@
     }
 
     // création de la base
-    $mysqli->query("DROP DATABASE IF EXISTS boissons");
+    mysqli_query($mysqli, "DROP DATABASE IF EXISTS boissons");
 
     $requete = "CREATE DATABASE IF NOT EXISTS boissons CHARACTER SET utf8mb4;";
     if (!mysqli_query($mysqli, $requete)) {
@@ -94,9 +94,9 @@
     
     while ($i < $total_recettes) {   // parcours de l'array recette
 
-        $titre = $mysqli -> escape_string($Recettes[$i]["titre"]);
-        $ingredients = $mysqli -> escape_string($Recettes[$i]["ingredients"]);
-        $preparation = $mysqli -> escape_string($Recettes[$i]["preparation"]);
+        $titre = mysqli_real_escape_string($mysqli, $Recettes[$i]["titre"]);
+        $ingredients = mysqli_real_escape_string($mysqli, $Recettes[$i]["ingredients"]);
+        $preparation = mysqli_real_escape_string($mysqli, $Recettes[$i]["preparation"]);
         
         $requete = "INSERT INTO recettes (titre,ingredients,preparation)
         VALUES ('$titre','$ingredients','$preparation');";          // on ajoute la ligne i à la table
@@ -135,7 +135,7 @@
     
     foreach ($Hierarchie as $nom => $data) {  // parcours de l'array hierarchie
 
-         $nom = $mysqli -> escape_string($nom);
+         $nom = mysqli_real_escape_string($mysqli, $nom);
     
          $requete = "INSERT INTO aliments (nom)
                         VALUES ('$nom');";          // on ajoute la ligne i à la table
@@ -171,7 +171,7 @@
     
         foreach ($Hierarchie as $nom => $data) {  //parcours de l'array hierarchie
 
-         $nom = $mysqli -> escape_string($nom);
+         $nom = mysqli_real_escape_string($mysqli, $nom);
          $requete = "SELECT id_aliment FROM aliments WHERE nom = '$nom';";
          
          $result = mysqli_query($mysqli, $requete); 
@@ -181,7 +181,7 @@
          if (isset($data['sous-categorie']) && is_array($data['sous-categorie'])) { //check si l'aliment a une sous categorie
          
         foreach ($data['sous-categorie'] as $sous_nom) {            //regarde les sous categories de l'element ou on est
-                $sous_nom = $mysqli -> escape_string($sous_nom);
+                $sous_nom = mysqli_real_escape_string($mysqli, $sous_nom);
                 $requete = "SELECT id_aliment FROM aliments WHERE nom = '$sous_nom';";
          
          		$result = mysqli_query($mysqli, $requete); 
@@ -229,7 +229,7 @@
         $i = 0;
     	while ($i < count($Recettes)) {   //parcours de l'array recette 
 
-         $titre = $mysqli -> escape_string($Recettes[$i]["titre"]);
+         $titre = mysqli_real_escape_string($mysqli, $Recettes[$i]["titre"]);
          $requete = "SELECT id_recette FROM recettes WHERE titre = '$titre';";
          
          $result = mysqli_query($mysqli, $requete); 
@@ -238,7 +238,7 @@
          
         
         foreach ($Recettes[$i]['index'] as $ingredient) {            //regarde les sous categories de l'element ou on est
-                $ingredient = $mysqli -> escape_string($ingredient);
+                $ingredient = mysqli_real_escape_string($mysqli, $ingredient);
                 $requete = "SELECT distinct id_aliment FROM aliments WHERE nom = '$ingredient';";
          
          		$result = mysqli_query($mysqli, $requete); 

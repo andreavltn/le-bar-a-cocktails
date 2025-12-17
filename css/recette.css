@@ -54,13 +54,22 @@
     justify-content: flex-start;
 }
 
+/* Conteneur titre et bouton like */
+.titre-like-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
 /* Titre de la recette */
 .recette-titre {
     font-size: 32px;
     font-weight: 600;
     color: #333;
-    margin-bottom: 30px;
     line-height: 1.3;
+    flex: 1;
 }
 
 /* Section de la recette */
@@ -166,4 +175,50 @@
 
 .bouton-retour:hover {
     background-color: #e55555;
+}
+
+/* Bouton like (favori) */
+.bouton-like {
+    appearance: none;
+    background-color: transparent !important;
+    border: 2px solid #ff6b6b;
+    color: #ff6b6b;
+    font-size: 28px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 0;
+}
+
+.bouton-like:hover {
+    background-color: #ffe0e0;
+    transform: scale(1.1);
+}
+
+/* quand il est actif (cliqué/recette deja en favoris) */
+.bouton-like.actif {
+    background-color: #ff6b6b;
+    color: #ffffff;
+    border-color: #ff6b6b;
+}
+
+.bouton-like.actif:hover {
+    background-color: #e55555;
+    border-color: #e55555;
+}
+
+.icone-like {
+    display: block;
+    line-height: 1;
+    color: inherit;
+}
+
+.bouton-like.actif .icone-like {
+    color: #ffffff;
 }
