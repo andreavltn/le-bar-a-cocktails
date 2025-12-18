@@ -51,6 +51,7 @@ while ($alim = mysqli_fetch_assoc($recette)) $contenu_recette [] = $alim;
 
         <div class="banniere-bloc-milieu">
             <li><a href="accueil.php">Accueil du site</a></li>
+            <li><a href="decouvrir-recettes.php">Liste des recettes</a></li>
             <li class ="page-en-cours">Rechercher une recette</a></li>
             <li><a href="hierarchie.php">Rechercher par hiérarchie</a></li>
             <li><a href="favoris.php">Consulter les favoris</a></li>

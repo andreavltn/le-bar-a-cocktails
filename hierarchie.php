@@ -94,6 +94,7 @@ require_once("connect_db.php");
 
     <div class="banniere-bloc-milieu">
         <li><a href="accueil.php">Accueil du site</a></li>
+        <li><a href="decouvrir-recettes.php">Liste des recettes</a></li>
         <li><a href="recherche.php">Rechercher une recette</a></li>
         <li class="page-en-cours">Rechercher par hiérarchie</a></li>
         <li><a href="favoris.php">Consulter les favoris</a></li>
