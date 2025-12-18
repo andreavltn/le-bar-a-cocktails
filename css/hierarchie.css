@@ -1,13 +1,18 @@
+.contenu {
+    padding: 20px;
+    box-sizing: border-box;
+}
+
 /* conteneur */
 .bloc-recette {
     padding: 40px;
 }
 
-/* grille */
+/* Grille de cartes : 4 par ligne sur desktop */
 .bloc-recette {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 30px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 30px;
 }
 
 .recette-container {
@@ -16,11 +21,13 @@
     overflow: hidden;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    padding: 10px;
 }
 
 .recette-container:hover {
     transform: translateY(-6px);
     box-shadow: 0 18px 35px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
 }
 
 
@@ -95,19 +102,4 @@
     font-size: 14px;
     font-weight: 500;
     display: inline-block;
-}
-
-@media (max-width: 768px) {
-    .bloc-recette {
-        padding: 20px;
-        gap: 20px;
-    }
-
-    .recette-image {
-        height: 180px;
-    }
-
-    .recette-titre {
-        font-size: 20px;
-    }
 }

@@ -1,7 +1,6 @@
 /* Bloc avec le bouton Retour */
 .bloc-retour {
-    padding: 20px 0;
-    margin-bottom: 20px;
+    padding: 20px;
 }
 
 .bloc-retour a {

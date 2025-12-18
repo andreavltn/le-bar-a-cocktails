@@ -1,3 +1,82 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+a {
+    text-decoration: none;
+    color: white;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: #ccc;
+}
+
+/* Bannière en haut du site */
+.banniere {
+    background-color: black;
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Bloc gauche (logo) */
+.banniere-bloc-gauche {
+    display: flex;
+    align-items: center;
+}
+
+.banniere-bloc-gauche img {
+    width: 100px;
+}
+
+/* Bloc milieu (menu) */
+.banniere-bloc-milieu {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    list-style: none;
+}
+
+.page-en-cours {
+    text-decoration: underline;
+    text-decoration-thickness: 0.5px;
+    text-underline-offset: 5px; 
+}
+
+.banniere-bloc-milieu li {
+    list-style: none;
+}
+
+/* Bloc droit (compte) */
+.banniere-bloc-droite {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+}
+
+.banniere-bloc-droite img {
+    width: 50px;
+}
+
+/* Le bouton de déconnexion si on est connecté */
+.bouton-deconnexion {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+}
 
 html, body {
     height: 100%;
@@ -26,22 +105,21 @@ html, body {
 
 
 .stylegrilleinter {
-                display: flex;     /* flex pour pouvoir gerer la case plus facilement */
-                flex-direction: column; 
-                justify-content: center;   /* centrage vertical */
-                align-items: center;       /* centrage horizontal */
-                height: 60px;             /* hauteur d'une boite */
-                border: 7px solid; /* couleur bordure*/
-                border-color: #000;
-                background-color: #000;  
-                color: #fff;
-                font-size: 20;
-                font-weight: 50;
-                padding: 2px;   /* espace entre la boite et le texte*/
-                border-radius: 5px; /* arrondi coin */
-                transition: transform 0.2s; /* temps de l'animation du mouseover */
-                order : 50;
-              
+    display: flex;     /* flex pour pouvoir gerer la case plus facilement */
+    flex-direction: column; 
+    justify-content: center;   /* centrage vertical */
+    align-items: center;       /* centrage horizontal */
+    height: 60px;             /* hauteur d'une boite */
+    border: 7px solid; /* couleur bordure*/
+    border-color: #000;
+    background-color: #000;  
+    color: #fff;
+    font-size: 14px;
+    font-weight: 50;
+    padding: 2px;   /* espace entre la boite et le texte*/
+    border-radius: 5px; /* arrondi coin */
+    transition: transform 0.2s; /* temps de l'animation du mouseover */
+    order : 50;
 }
 
 .stylegrilleinter.vert { border-color: rgba(60, 255, 0, 0.567); order : 10;} 
@@ -52,7 +130,7 @@ html, body {
 
 .stylegrilleinter:hover {
     transform: translateY(-3px);
-
+    cursor: pointer;
 }
 
 
@@ -119,6 +197,7 @@ html, body {
 
 .stylegrilleinterboissons:hover {
     transform: translateY(-5px);
+    cursor: pointer;
 }
 
 .stylegrilleinterboissons.vert { border-color: rgba(0, 0, 255, 0.621); } 

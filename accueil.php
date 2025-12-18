@@ -11,6 +11,7 @@
     <meta charset="UTF-8">
     <title>Le bar à cocktails</title>
     <link rel="shortcut icon" href="images/logo-site.png">
+    <link rel="stylesheet" href="css/structure-page.css">
     <link rel="stylesheet" href="css/accueil.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
@@ -24,6 +25,7 @@
         <div class="banniere-bloc-milieu">
             <li class ="page-en-cours"><div>Accueil du site</div></li>
             <li><a href="recherche.php">Rechercher une recette</a></li>
+            <li><a href="hierarchie.php">Rechercher par hiérarchie</a></li>
             <li><a href="favoris.php">Consulter les favoris</a></li>
             <?php
                 // si on est connecté, affiche le bouton de déconnexion
@@ -55,7 +57,7 @@
                     Découvrez plus de <strong>100 recettes de cocktails</strong> en tout genre, en filtrant et choisissant vos <strong>ingrédients préférés</strong>,
                     pour créer la boisson parfaite qui saura plaire à tous vos invités.
                 </p>
-                <a href="decouvrirrecettes.php" class="bouton-intro-decouvrir">Découvrir les recettes</a>
+                <a href="decouvrir-recettes.php" class="bouton-intro-decouvrir">Découvrir les recettes</a>
             </div>
             <div class="image-intro">
                 <img src="images/image-accueil.png" alt="image-accueil.png">

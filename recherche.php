@@ -3,7 +3,7 @@
 session_start();
 require_once("connect_db.php");
 
-// recuper les données des tables et le met dans des tableaux
+// recupérer les données des tables et les met dans des tableaux
 
 
 $liste_aliment = qdb("SELECT id_aliment, nom FROM aliments ORDER BY nom ASC");
@@ -38,7 +38,7 @@ while ($alim = mysqli_fetch_assoc($recette)) $contenu_recette [] = $alim;
     <meta charset="UTF-8">
     <title>Recette - Le bar à cocktails</title>
     <link rel="shortcut icon" href="images/logo-site.png">
-    <link rel="stylesheet" href="css/accueil.css">
+    <link rel="stylesheet" href="css/structure-page.css">
     <link rel="stylesheet" href="css/recherche.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
@@ -52,6 +52,7 @@ while ($alim = mysqli_fetch_assoc($recette)) $contenu_recette [] = $alim;
         <div class="banniere-bloc-milieu">
             <li><a href="accueil.php">Accueil du site</a></li>
             <li class ="page-en-cours">Rechercher une recette</a></li>
+            <li><a href="hierarchie.php">Rechercher par hiérarchie</a></li>
             <li><a href="favoris.php">Consulter les favoris</a></li>
             <?php
                 // si on est connecté, affiche le bouton de déconnexion
