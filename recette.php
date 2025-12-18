@@ -305,7 +305,7 @@
             }
 
             // requête à update-favori-like.php pour mettre à jour la bdd/la session en arrière-plan
-            fetch('update-favoris-like.php?id=<?php echo $id_recette; ?>');
+            fetch('update-favoris.php?id=<?php echo $id_recette; ?>');
 
             // popup de confirmation
             if(devientActif){

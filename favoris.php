@@ -97,7 +97,7 @@
 
                 // si le tableau est vide (pas de favoris) : message d'avertissement
                 if ($nb_fav_session === 0) {
-                    echo '<div class="aucun-favori-message">Aucun favori pour le moment.<br><a href="recherche.php">Découvrir des recettes</a></div>';
+                    echo '<div class="aucun-favori-message">Aucun favori pour le moment.</div>';
                     // on sort de la section pour ne pas afficher la grille
                     return;
                 }
@@ -187,9 +187,16 @@
 
                     echo '<div class="recette-contenu">';
 
-                    // ------------------- TITRE -------------------
-                    
+
+                    // ------------------- TITRE + ETOILE FAVORI -------------------
+                    echo "<div class='titre-like'>";
                     echo '<h2 class="recette-titre">' . htmlspecialchars($recette['titre']) . '</h2>';
+                    
+                    // étoile cliquable
+                    echo "<img src='images/logo-etoile-jaune.png' class='image-like actif' 
+                    title='Supprimer des favoris' 
+                    onclick=\"supprimerFavori(event, this, " . $recette['id_recette'] . ")\">";
+                    echo "</div>";
 
                     // INGREDIENTS CLÉS
                     if (isset($ingredients_par_recette[$recette['id_recette']])) {
@@ -216,12 +223,45 @@
     </section>
 
     <script>
+
         // fonction qui affiche un pop up pour valider la déconnexion
         function confirmerDeconnexion() {
+
+            // affiche un pop-up de validation
             if (confirm('Souhaitez vous vraiment vous déconnecter ?')) {
-                // redirection vers la page de déconnexion
+
+                // redirection vers la page de déconnexion si on clique oui
                 window.location.href = 'account/logout.php';
             }
+        }
+
+        // fonction qui supprime un favori en cliquant sur l'étoile
+        function supprimerFavori(event, img, id_recette) {
+            
+            event.stopPropagation(); // empêche la propagation (pour éviter la redirection du parent)
+
+            // au clic -> supprime la recette via update-favoris en arrière plan
+            fetch('update-favoris.php?id=' + id_recette)
+
+                // et seulement ensuite une fois que c'est fini 
+                .then(() => {
+
+                    let carte = img.closest('.recette-container'); // récupère le conteneur de l'étoile
+                    if (carte) carte.remove(); // retire la carte de l'affichage
+
+                    // si il n'y a plus aucune carte de recette
+                    if (!document.querySelector('.recette-container')) {
+
+                        // récupère le bloc complet de la page (sous la bannière)
+                        let bloc = document.querySelector('.bloc-recette'); 
+
+                        // le remplace par le simple message "Aucun favori pour le moment"
+                        bloc.outerHTML = '<div class="aucun-favori-message">Aucun favori pour le moment.</div>';
+                    }
+
+                    // affiche un pop-up de confirmation
+                    alert('La recette a été supprimée des favoris!');
+                });
         }
     </script>
 

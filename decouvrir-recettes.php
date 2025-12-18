@@ -93,7 +93,7 @@
         echo '<div class="recette-container" onclick="window.location.href=\'recette.php?id=' . $recette['id_recette'] . '\'">';
 
 
-            // ------------------- IMAGE -------------------
+        // ------------------- IMAGE -------------------
 
         echo '<div class="recette-image">';
 
