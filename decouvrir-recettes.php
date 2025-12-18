@@ -9,7 +9,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Recette - Le bar à cocktails</title>
+    <title>Les recettes - Le bar à cocktails</title>
     <link rel="shortcut icon" href="images/logo-site.png">
     <link rel="stylesheet" href="css/structure-page.css">
     <link rel="stylesheet" href="css/decouvrir-recettes.css">
