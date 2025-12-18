@@ -9,7 +9,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Les recettes - Le bar à cocktails</title>
+    <title>Les recettes | Le bar à cocktails</title>
     <link rel="shortcut icon" href="images/logo-site.png">
     <link rel="stylesheet" href="css/structure-page.css">
     <link rel="stylesheet" href="css/decouvrir-recettes.css">
@@ -19,11 +19,11 @@
 <body>
     <header class="banniere">
         <div class="banniere-bloc-gauche">
-            <a href="accueil.php"><img src="images/logo-site.png" alt="logo-site.png"></a>
+            <a href="index.php"><img src="images/logo-site.png" alt="logo-site.png"></a>
         </div>
 
         <div class="banniere-bloc-milieu">
-            <li><a href="accueil.php">Accueil du site</a></li>
+            <li><a href="index.php">Accueil du site</a></li>
             <li class="page-en-cours">Liste des recettes</a></li>
             <li><a href="recherche.php">Rechercher une recette</a></li>
             <li><a href="hierarchie.php">Rechercher par hiérarchie</a></li>

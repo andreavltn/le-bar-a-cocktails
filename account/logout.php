@@ -7,7 +7,7 @@
     // affichage du popup de confirmation et redirection vers la page d'accueil
     echo "<script>
         alert('Vous êtes maintenant déconnecté');
-        window.location.href = '../accueil.php';
+        window.location.href = '../index.php';
     </script>";
 
 ?>

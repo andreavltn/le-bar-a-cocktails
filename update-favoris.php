@@ -3,9 +3,9 @@
     require_once("connect_db.php");
 
     // si jamais on arrive sur cette page sans passer par recette.php
-    // renvoi vers l'accueil
+    // renvoi vers l'accueil 
     if (!isset($_GET['id'])) {
-        header("Location: accueil.php");
+        header("Location: index.php");
         exit();
     }
 

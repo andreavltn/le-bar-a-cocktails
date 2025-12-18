@@ -2,17 +2,17 @@
 
 <?php
     session_start();
-    require_once("connect_db.php")
+    require_once("connect_db.php");
 ?>
 
 <html lang="fr">
 
 <head>
     <meta charset="UTF-8">
-    <title>Le bar à cocktails</title>
+    <title>Accueil | Le bar à cocktails</title>
     <link rel="shortcut icon" href="images/logo-site.png">
     <link rel="stylesheet" href="css/structure-page.css">
-    <link rel="stylesheet" href="css/accueil.css">
+    <link rel="stylesheet" href="css/index.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 

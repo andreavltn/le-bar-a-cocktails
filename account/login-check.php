@@ -70,6 +70,6 @@
         unset($_SESSION['favoris']);
     }
 
-    header("Location: ../accueil.php"); // renvoi sur la page d'accueil
+    header("Location: ../index.php"); // renvoi sur la page d'accueil
 
 ?>

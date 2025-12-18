@@ -6,14 +6,20 @@
     $dbpassword = ""; 
     $dbname = "boissons"; 
 
-    // connexion à la base de données boissons
-    $dblink = mysqli_connect($dbhost, $dbuser, $dbpassword, $dbname); 
-    if (!$dblink) {
-        die("Erreur de connexion : " . mysqli_connect_error());
-    }
+    // test pour vérifier si la base boissons existe déjà
 
-    // sélection de la base de données boissons
-    $db = mysqli_select_db($dblink, $dbname);
+    // requête de connexion
+    $dblink = mysqli_connect($dbhost, $dbuser, $dbpassword);
+
+    // tente de se connecter à la base
+    try {
+        mysqli_select_db($dblink, $dbname);
+    } catch (mysqli_sql_exception $e) {
+        
+        // redirige vers l'install si la connexion ne fonctionne pas (pour créer la base)
+        header('Location: install.php');
+        exit;
+    }
 
     // fonction pour réaliser une requête sql sur la table
     function qdb($sql) {

@@ -17,9 +17,6 @@
         die("Erreur création base : " . mysqli_error($mysqli));
     }
 
-    // affiche le succès de la création
-    echo "Base de données 'boissons' créée avec succès<br>";
-
     // sélection de la base
     if (!mysqli_select_db($mysqli, "boissons")) {
         die("Erreur sélection base : " . mysqli_error($mysqli));
@@ -48,9 +45,6 @@
         die("Erreur création table utilisateur : " . mysqli_error($mysqli));
     }
 
-    // affiche le succès de la création
-    echo "Table 'utilisateur' créée avec succès<br>";
-
     // création table favoris
     $requete = "
         CREATE TABLE favoris (
@@ -65,9 +59,6 @@
     if (!mysqli_query($mysqli, $requete)) {
         die("Erreur création table favoris : " . mysqli_error($mysqli));
     }
-
-    // affiche le succès de la création
-    echo "Table 'favoris' créée avec succès<br>";
     
     // création table recette
     $requete = "
@@ -83,14 +74,9 @@
 	if (!mysqli_query($mysqli, $requete)) {
 	    die("Erreur création table recette : " . mysqli_error($mysqli));
     }
-
-    // affiche le succès de la création
-    echo "Table 'recettes' créée avec succès<br>";
-    
     
     $i = 0;
     $total_recettes = count($Recettes);
-    echo "Nombre total de recettes à insérer : $total_recettes<br>";
     
     while ($i < $total_recettes) {   // parcours de l'array recette
 
@@ -102,16 +88,11 @@
         VALUES ('$titre','$ingredients','$preparation');";          // on ajoute la ligne i à la table
     
         if (!mysqli_query($mysqli, $requete)) {
-            echo "Erreur à la recette $i : " . mysqli_error($mysqli) . "<br>";
             die("Arrêt du script");
         }
         
         $i++;
-    }
-    
-    // affiche le nombre de recettes insérées
-    echo "Recettes insérées : $i<br>";
-    
+    } 
     
     // création table aliments
     $requete = "
@@ -126,12 +107,8 @@
 	    die("Erreur création table aliments : " . mysqli_error($mysqli));
     }
 
-    // affiche le succès de la création
-    echo "Table 'aliments' créée avec succès<br>";
-
     // affiche le nombre d'aliments à insérer
     $total_aliments = count($Hierarchie);
-    echo "Nombre total d'aliments à insérer : $total_aliments<br>";
     
     foreach ($Hierarchie as $nom => $data) {  // parcours de l'array hierarchie
 
@@ -146,9 +123,6 @@
         }
     }
 
-    // affiche le nombre d'aliments insérés
-    echo "Aliments insérés : " . count($Hierarchie) . "<br>";
-
     // Création table hierarchie
     
     $requete = "
@@ -162,9 +136,6 @@
     	if (!mysqli_query($mysqli, $requete)) {
 	die("Erreur création table hierarchie : " . mysqli_error($mysqli));
     }
-
-    // affiche le succès de la création
-    echo "Table 'hierarchie' créée avec succès<br>";
 
     // compteur pour les relations hiérarchiques
     $nb_relations_hierarchie = 0;
@@ -200,10 +171,7 @@
 	$nb_relations_hierarchie++;
     }}
     }
-
-    // affiche le nombre de relations hiérarchiques insérées
-    echo "Relations hiérarchiques insérées : $nb_relations_hierarchie<br>";
-    
+  
     
     //Création table ingredient_recette
     
@@ -219,9 +187,6 @@
     	if (!mysqli_query($mysqli, $requete)) {
 	die("Erreur création table ingredient_recette: " . mysqli_error($mysqli));
     }
-
-    // affiche le succès de la création
-    echo "Table 'ingredient_recette' créée avec succès<br>";
 
     // compteur pour les relations ingrédients-recettes
     $nb_relations_ingredients = 0;
@@ -263,11 +228,9 @@
     $i++;    
     }
 
-    // affiche le nombre de relations ingrédients-recettes insérées
-    echo "Relations ingrédients-recettes insérées : $nb_relations_ingredients<br>";
-    
-    echo "La base a été créée avec succès !<br>";
-
-    // Fermeture de la connexion
+    // fermeture de la connexion
     mysqli_close($mysqli);
+
+    // redirige vers l'accueil
+    header("index.php");
 ?>
