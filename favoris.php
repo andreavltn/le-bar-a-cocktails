@@ -52,8 +52,10 @@
 
     <section class="contenu">
         <?php
+
             // si on est connecté
             if (isset($_SESSION["pseudo"])) {
+
                 // récupérer le pseudo depuis la session
                 $pseudo = $_SESSION["pseudo"];
 
@@ -65,27 +67,23 @@
                     INNER JOIN utilisateur ON id_user = id
                     WHERE pseudo = ?
                 ";
+                $req_recettes_fav = mysqli_prepare($dblink, $sql_recettes_fav); // préparation
+                mysqli_stmt_bind_param($req_recettes_fav, "s", $pseudo); // liaison du paramètre (chaine)
+                mysqli_stmt_execute($req_recettes_fav); // exécution
+                $resultat_recettes_fav = mysqli_stmt_get_result($req_recettes_fav); // récupération du résultat
 
-                // préparation
-                $req_recettes_fav = mysqli_prepare($dblink, $sql_recettes_fav);
+                if (!$resultat_recettes_fav) {
+                    die("Erreur requete recettes connecté : " . mysqli_error($dblink));
+                }   
 
-                // liaison du paramètre (chaine)
-                mysqli_stmt_bind_param($req_recettes_fav, "s", $pseudo);
-
-                // exécution
-                mysqli_stmt_execute($req_recettes_fav);
-
-                // récupération du résultat
-                $resultat_recettes_fav = mysqli_stmt_get_result($req_recettes_fav);
-                // unifie la variable résultat pour l'affichage
-                $resultat = $resultat_recettes_fav;
+                $resultat = $resultat_recettes_fav; // unifie la variable résultat pour l'affichage
 
             }
             else {
 
                 // sinon on n'est pas connecté :
 
-                // si on a des favoris (stocké dans la session)
+                // si on a des favoris (stockés dans la session)
                 if(isset($_SESSION['favoris'])) {
                     $favoris_session = $_SESSION['favoris']; // les récupère
                 } else {
@@ -112,9 +110,8 @@
                     FROM recettes
                     WHERE id_recette IN ($placeholders)
                 ";
-                
                 $req_recettes = mysqli_prepare($dblink, $sql_recettes); // préparation de la requête
-                
+
                 // les types sont des entiers (on crée une liste de n "i", n étant le nombre de favoris)
                 $types = str_repeat('i', count($favoris_session));
 
@@ -122,12 +119,11 @@
                 mysqli_stmt_execute($req_recettes); // exécution de la requête
                 $resultat_recettes = mysqli_stmt_get_result($req_recettes); // récupération du résultat
                 
-                // unifie la variable résultat pour l'affichage
-                $resultat = $resultat_recettes;
-
                 if (!$resultat_recettes) {
-                    die("Erreur requete recettes : " . mysqli_error($dblink));
-                }   
+                    die("Erreur requete recettes deconnecté : " . mysqli_error($dblink));
+                }  
+
+                $resultat = $resultat_recettes; // unifie la variable résultat pour l'affichage
             }
 
 
@@ -135,27 +131,28 @@
             $sql_tags = "SELECT id_recette, a.nom FROM aliments a
                         INNER JOIN ingredient_recette ir ON a.id_aliment = ir.id_ingredient";
 
-            $req_tags = mysqli_query($dblink, $sql_tags); // préparation de la requête
+            $req_tags = mysqli_query($dblink, $sql_tags); // éxécution de la requête
 
-            if (!$req_tags) {
-                die("Erreur requete ingrédients : " . mysqli_error($dblink));
-            }
-
-            // fait la table des noms d'ingredients par id recette
-            $ingredients_par_recette = [];
-            while ($tag = mysqli_fetch_assoc($req_tags)) {
+            // remplissage du tableau via les résultats de la requête
+            $ingredients_par_recette = []; 
+            while ($tag = mysqli_fetch_assoc($req_tags)) { 
                 $ingredients_par_recette[$tag['id_recette']][] = $tag['nom'];
             }
 
-            // vérifier s'il y a des recettes
+            // si il n'y a aucune recette dans les favoris, affiche juste un message 
             if (mysqli_num_rows($resultat) == 0) {
                 echo '<div class="aucun-favori-message">Aucun favori pour le moment.<br><a href="recherche.php">Découvrir des recettes</a></div>';
             } else {
-                //boucle des recettes                     
+                
+                // sinon on affiche les recettes avec des cartes :                  
                 echo '<div class="bloc-recette">';
+
+                // pour chaque recette trouvée par la requête 
                 while ($recette = mysqli_fetch_assoc($resultat)) {
 
-                    echo '<div class="recette-container" onclick="window.location.href=\'recette.php?id=' . $recette['id_recette'] . '\'">';
+                    // crée une carte qui lorsqu'elle est cliquée, redirige vers la page recette associée
+                    echo '<div class="recette-container" 
+                    onclick="window.location.href=\'recette.php?id=' . $recette['id_recette'] . '\'">';
 
 
                     // ------------------- IMAGE -------------------
@@ -187,18 +184,24 @@
 
                     echo '<div class="recette-contenu">';
 
-
                     // ------------------- TITRE + ETOILE FAVORI -------------------
+
                     echo "<div class='titre-like'>";
+
+                    // récupère le titre de la recette
                     echo '<h2 class="recette-titre">' . htmlspecialchars($recette['titre']) . '</h2>';
                     
-                    // étoile cliquable
+                    // ajoute une étoile cliquable
+                    // la cliquer appelle la fonction supprimerFavori()
                     echo "<img src='images/logo-etoile-jaune.png' class='image-like actif' 
                     title='Supprimer des favoris' 
                     onclick=\"supprimerFavori(event, this, " . $recette['id_recette'] . ")\">";
+
                     echo "</div>";
 
-                    // INGREDIENTS CLÉS
+                    // ------------------- INGREDIENT CLES  -------------------
+
+                    // si il y a une recette dans le tableau des ingrédients 
                     if (isset($ingredients_par_recette[$recette['id_recette']])) {
 
                         echo '<div class="recette-section">';
@@ -210,14 +213,13 @@
                         echo '<span class="tag">' . htmlspecialchars($ingredient) . '</span>';
                     }
 
-                    echo '</div>';
-                    echo '</div>';
+                    echo '</div>'; // tags-ingredients
+                    echo '</div>'; // recette-section
                 }
 
                 echo '</div>'; // recette-contenu
                 echo '</div>'; // recette-container
                 }
-                echo '</div>';
             }
         ?>
     </section>
@@ -238,7 +240,9 @@
         // fonction qui supprime un favori en cliquant sur l'étoile
         function supprimerFavori(event, img, id_recette) {
             
-            event.stopPropagation(); // empêche la propagation (pour éviter la redirection du parent)
+            // empêche la propagation (pour éviter la redirection vers la recette)
+            // qui vient de l'élément parent (la carte)
+            event.stopPropagation(); 
 
             // au clic -> supprime la recette via update-favoris en arrière plan
             fetch('update-favoris.php?id=' + id_recette)
@@ -247,7 +251,11 @@
                 .then(() => {
 
                     let carte = img.closest('.recette-container'); // récupère le conteneur de l'étoile
-                    if (carte) carte.remove(); // retire la carte de l'affichage
+                    
+                    // retire la carte de l'affichage
+                    if (carte){
+                        carte.remove(); 
+                    }  
 
                     // si il n'y a plus aucune carte de recette
                     if (!document.querySelector('.recette-container')) {
