@@ -12,8 +12,8 @@
         $id_recette = null;
     }
 
-    // récupérer la recette depuis la BDD
-    if ($id_recette !== null) {
+    // récupérer la recette depuis la BDD si l'id est dans l'url
+    if ($id_recette != null) {
 
         // requête sql pour récupérer les éléments de la recette à partir d'un id
         $sql = "SELECT id_recette, titre, ingredients, preparation FROM recettes WHERE id_recette = ?";
@@ -22,18 +22,18 @@
         mysqli_stmt_execute($req_recettes); // exécuter la requête
         $resultat = mysqli_stmt_get_result($req_recettes); // récupérer le résultat
 
-        // si une recette est trouvée
-        if ($recette = mysqli_fetch_assoc($resultat)) {
-            // recette récupérée
-        } else {
+        // récupération des résultats (null si il n'y a rien)
+        if (!$recette = mysqli_fetch_assoc($resultat)) {
             $recette = null;
         }
 
-        // fermeture de la requête recette
+        // fermeture de la requête
         mysqli_stmt_close($req_recettes);
 
     } else {
-        $recette = null;
+
+        // sinon par sécurité on met à null (ca ne devrait pas arriver)
+        $recette = null; 
     }
 ?>
 
@@ -43,19 +43,21 @@
     <meta charset="UTF-8">
     <title>
         <?php
-            if ($recette !== null) {
 
-                // récupérer uniquement le nom
+            // si la recette existe
+            if ($recette != null) {
+
+                // récupérer uniquement le nom (sans les textes supplémentaires)
                 $titre = $recette['titre'];
                 $titre = explode(':', $titre)[0];
                 $titre = explode('(', $titre)[0];
                 $titre = trim($titre);
 
-                echo htmlspecialchars($titre);
+                echo htmlspecialchars($titre); // affiche le titre de la recette comme nom d'onglet
 
             } else {
                 
-                echo "Recette introuvable";
+                echo "Recette introuvable"; // sinon "recette introuvable"
             }
         ?>
     </title>
@@ -117,7 +119,7 @@
                     echo '<div class="recette-image">';
 
                     // créer le nom de l'image (pour la retrouver dans le dossier images)
-                    // en minuscules, remplace les espaces par des _
+                    // en minuscules, et remplace les espaces par des _
                     $nom_image = strtolower(str_replace(' ', '_', $recette['titre']));
 
                     // extraire seulement le nom avant les parenthèses (si il y en a)
@@ -129,7 +131,7 @@
                     // création du chemin du fichier
                     $chemin_image = "images/" . $nom_image . ".jpg";
 
-                    // vérifier si l'image existe, sinon utilise l'image par défaut
+                    // vérifier si l'image existe, sinon utilise l'image placeholder 
                     if (!file_exists($chemin_image)) {
                         $chemin_image = "images/image_placeholder.jpg";
                     }
@@ -141,6 +143,8 @@
                     echo '<div class="recette-contenu">';
 
                     // ------------------- TITRE ET BOUTON LIKE -------------------
+
+                    // affichage au chargement de la page (initialisation)
 
                     // variable a true si la recette est déjà dans les favoris
                     $estFavori = false;
@@ -154,33 +158,38 @@
                         mysqli_stmt_bind_param($req_check, "ii", $id_recette, $_SESSION["id"]); // liaison des paramètres (deux entiers)
                         mysqli_stmt_execute($req_check); // éxécution de la requête
 
-                        // si il y a au moins un résultat, la recette fait partie des favoris de l'utilisateur
+                        // si il elle y est
                         if(mysqli_num_rows(mysqli_stmt_get_result($req_check)) > 0) {
-                            $estFavori = true;
+                            $estFavori = true; // met à jour la variable
                         }
 
                         mysqli_stmt_close($req_check); // fermeture de la requête
+
                     } else {
 
                         // sinon on n'est pas connecté
 
                         // si l'id de la recette est dans les favoris de la session
                         if(isset($_SESSION['favoris']) && in_array($id_recette, $_SESSION['favoris'])) {
-                            $estFavori = true;
+                            $estFavori = true; // met à jour la variable
                         }
                     }
 
-                    // si la recette est en favoris avant le clic
+                    // si la recette est en favoris 
                     if($estFavori) {
-                        $classe_like = 'image-like actif'; // passe en actif (ajout d'une classe)
-                        $texte_like = 'Supprimer des favoris'; // change le texte au survol (suppression)
-                        $image_like = 'images/logo-etoile-jaune.png'; // change le logo (étoile jaune)
-                    } else { // sinon elle n'est pas en favori
+
+                        $classe_like = 'image-like actif'; // ajout de la classe "actif"
+                        $texte_like = 'Supprimer des favoris'; // change le texte au survol
+                        $image_like = 'images/logo-etoile-jaune.png'; // affiche l'étoile en jaune
+                    } else { 
+                        
+                        // sinon elle n'est pas en favori
                         $classe_like = 'image-like'; // sinon il reste bouton-like
-                        $texte_like = 'Ajouter aux favoris'; // change le texte au survol (ajout)
-                        $image_like = 'images/logo-etoile-blanc.png'; // change le logo (étoile blanche)
+                        $texte_like = 'Ajouter aux favoris'; // change le texte au survol
+                        $image_like = 'images/logo-etoile-blanc.png'; // change l'étoile en blanc
                     }
 
+                    // affiche le nom de la recette et l'étoile de favoris
                     echo "<div class='titre-like'>
                             <h1 class='recette-titre'>" . htmlspecialchars($recette['titre']) . "</h1>
                             <img src='" . $image_like . "'
@@ -222,22 +231,10 @@
                                  INNER JOIN ingredient_recette ir ON a.id_aliment = ir.id_ingredient
                                  WHERE ir.id_recette = ?";
 
-                    // préparation de la requête
-                    $req_tags = mysqli_prepare($dblink, $sql_tags);
-
-                    // si erreur : stop
-                    if (!$req_tags) {
-                        die("Erreur prepare: " . mysqli_error($dblink));
-                    }
-
-                    // l'id est un entier
-                    mysqli_stmt_bind_param($req_tags, "i", $id_recette);
-
-                    // exécuter la requête
-                    mysqli_stmt_execute($req_tags);
-
-                    // récupérer les résultats
-                    $resultat_tags = mysqli_stmt_get_result($req_tags);
+                    $req_tags = mysqli_prepare($dblink, $sql_tags); // préparation de la requête
+                    mysqli_stmt_bind_param($req_tags, "i", $id_recette); // liaison du paramètre (entier)
+                    mysqli_stmt_execute($req_tags); // exécution la requête
+                    $resultat_tags = mysqli_stmt_get_result($req_tags); // récupérer les résultats
 
                     // si il y a des tags
                     if (mysqli_num_rows($resultat_tags) > 0) {
@@ -251,19 +248,19 @@
                             echo '<span class="tag">' . htmlspecialchars($tag['nom']) . '</span>';
                         }
 
-                        echo '</div>';
-                        echo '</div>';
+                        echo '</div>'; // tag-ingredients
+                        echo '</div>'; // recette-section
                     }
 
                     // fermeture de la requête tags
                     mysqli_stmt_close($req_tags);
 
-                    echo '</div>'; // fin recette-contenu
-                    echo '</div>'; // fin recette-container
+                    echo '</div>'; // recette-contenu
+                    echo '</div>'; // recette-container
 
                 } else {
 
-                    // (cas ou il n'y a pas de recette associée à l'id)
+                    // cas ou il n'y a pas de recette associée à l'id : message avertissement
                     echo '<div class="erreur-recette">';
                     echo '<p>Aucune recette trouvée.</p>';
                     echo '<a href="recherche.php" class="bouton-retour">Retour</a>';
@@ -274,6 +271,7 @@
     </section>
 
     <script>
+
         // fonction qui affiche un pop up pour valider la déconnexion
         function confirmerDeconnexion() {
             if (confirm('Souhaitez vous vraiment vous déconnecter ?')) {
@@ -282,29 +280,31 @@
             }
         }
 
-        // fonction appelée au clique sur l'étoile (mettre en favori/retirer des favoris une recette) :
+        // fonction appelée au clic sur l'étoile (mettre en favori/retirer des favoris une recette) :
         function liker(event) {
 
-            event.stopPropagation(); // évite la redirection causée par le parent
+            // empêche la propagation (pour éviter la redirection vers la recette)
+            // qui vient de l'élément parent (la carte)
+            event.stopPropagation(); 
 
             const img = event.currentTarget; // récupère l'image cliquée
-            const devientActif = !img.classList.contains('actif'); // true si le clic va ajouter aux favoris
+            const devientActif = !img.classList.contains('actif'); // true si le clic ajoute aux favoris
 
             // si le clic va ajouter la recette aux favoris
             if(devientActif){
 
-                img.classList.add('actif'); // ajoute la classe actif à l'image
+                img.classList.add('actif'); // ajoute la classe "actif" à l'image
                 img.title = 'Supprimer des favoris'; // change le texte au survol
-                img.src = 'images/logo-etoile-jaune.png'; // change l'image (passe au jaune)
+                img.src = 'images/logo-etoile-jaune.png'; // l'étoile devient jaune
 
             } else { // sinon le clic va supprimer la recette des favoris
 
                 img.classList.remove('actif'); // retire la classe actif à l'image
                 img.title = 'Ajouter aux favoris'; // change le texte au survol
-                img.src = 'images/logo-etoile-blanc.png'; // change l'image (passe au blanc)
+                img.src = 'images/logo-etoile-blanc.png'; // l'étoile devient blanche
             }
 
-            // requête à update-favori-like.php pour mettre à jour la bdd/la session en arrière-plan
+            // requête à update-favoris.php en arrière-plan pour mettre à jour la bdd/la session
             fetch('update-favoris.php?id=<?php echo $id_recette; ?>');
 
             // popup de confirmation
