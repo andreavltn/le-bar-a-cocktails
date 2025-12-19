@@ -2,8 +2,8 @@
     session_start();
     require_once("connect_db.php");
 
-    // si jamais on arrive sur cette page sans passer par recette.php
-    // renvoi vers l'accueil 
+    // si jamais on arrive sur cette page sans venir par recette.php
+    // renvoi vers l'accueil (parce que ca ne doit pas arruver)
     if (!isset($_GET['id'])) {
         header("Location: index.php");
         exit();
@@ -45,7 +45,8 @@
             mysqli_stmt_execute($req_supprimer); // éxécution de la requête
             mysqli_stmt_close($req_supprimer); // fermeture de la requête
         } else {
-            // requête pour l'ajouter dans la bdd
+
+            // sinon requête pour l'ajouter dans la bdd
             $sql_ajouter = "INSERT INTO favoris (id_recette, id_user) VALUES (?, ?)";
             $req_ajouter = mysqli_prepare($dblink, $sql_ajouter); // préparation de la requête
             mysqli_stmt_bind_param($req_ajouter, "ii", $id_recette, $id_user); // liaison des paramètres (deux entiers)
@@ -55,7 +56,7 @@
         
     } else {
 
-        // non connecté : gérer avec la session
+        // sinon on n'est pas connecté : gérer avec la session
         
         // initialiser le tableau de favoris si nécessaire
         if (!isset($_SESSION['favoris'])) {
@@ -82,5 +83,5 @@
         }
     }
 
-    exit();
+    exit(); // sortie
 ?>
