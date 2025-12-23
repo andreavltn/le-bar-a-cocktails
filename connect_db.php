@@ -14,6 +14,7 @@
     // tente de se connecter à la base
     try {
         mysqli_select_db($dblink, $dbname);
+        mysqli_set_charset($dblink, 'utf8mb4'); // encodage des caractères
     } catch (mysqli_sql_exception $e) {
         
         // redirige vers l'install si la connexion ne fonctionne pas (pour créer la base)

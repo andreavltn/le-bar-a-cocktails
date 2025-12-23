@@ -128,6 +128,9 @@
                     // enlever les espaces/caractères vides au début et à la fin
                     $nom_image = trim($nom_image);
 
+                    // première lettre en majuscule
+                    $nom_image = ucfirst($nom_image);
+
                     // création du chemin du fichier
                     $chemin_image = "images/" . $nom_image . ".jpg";
 
