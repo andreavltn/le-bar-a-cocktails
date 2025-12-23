@@ -29,9 +29,10 @@ require_once("connect_db.php");
     // ---------------------------
     // Gestion affichage recettes via sous-aliment
     // ---------------------------
-    if (isset($_GET['action']) && $_GET['action'] === 'recettes_sous_aliment' && isset($_GET['id_aliment'])) {
-        $id_aliment = (int)$_GET['id_aliment'];
+    if (isset($_GET['action']) && $_GET['action'] === 'recettesavecalim' && isset($_GET['id_aliment'])) { // lance la requete si on a fait le fetch
+        $id_aliment = (int)$_GET['id_aliment'];  //recup de l'id aliment
 
+ //recup des recettes qui contiennent l'aliment
         $sql = "SELECT id_recette, titre, ingredients
                 FROM recettes 
                 INNER JOIN ingredient_recette USING (id_recette)
@@ -41,6 +42,7 @@ require_once("connect_db.php");
             mysqli_stmt_execute($requete);
             $result = mysqli_stmt_get_result($requete);
 
+            //si on trouve des recettes on les affiche
         if (mysqli_num_rows($result) > 0) {
             while ($recette = mysqli_fetch_assoc($result)) {
                 echo '<div class="recette-container" onclick="window.location.href=\'recette.php?id=' . $recette['id_recette'] . '\'">';
@@ -120,19 +122,19 @@ require_once("connect_db.php");
 
 <script>
     const racine = <?= json_encode($racine) ?>;
-    const hierarchie = <?= json_encode($arraynomsousalim) ?>;
+    const hierarchie = <?= json_encode($arraynomsousalim) ?>;  // transfert des 2 requetes en js
 
-    // ---------------------------
+
     // Fonction pour afficher les sous-aliments
-    // ---------------------------
+
     function afficherSousaliment(id, boite) {
-        const listSA = hierarchie[id];
-        boite.innerHTML = "";
+        const listSA = hierarchie[id];  // recup les sous aliments
+        boite.innerHTML = "";  //clear le niveau
 
-        if (!listSA) return;
+        if (!listSA) return;    // si aucun sous alim on return
 
-        const suivant = document.createElement('div');
-        const boutonalim = document.createElement('div');
+        const suivant = document.createElement('div');  // crée le conteneur d'en dessous
+        const boutonalim = document.createElement('div'); // recrée le niveau actuel
         boutonalim.style.margin = "10px 0";
 
         listSA.forEach(sousal => {
@@ -165,13 +167,13 @@ require_once("connect_db.php");
     // Fonction pour afficher les recettes
     // ---------------------------
     function afficherRecettesSousAliment(id_sousaliment) {
-        const conteneur = document.getElementById('recettes-filtrees');
-        conteneur.innerHTML = "";
+        const conteneur = document.getElementById('recettes');
+        conteneur.innerHTML = "";  // enleve les anciennes recettes
 
-        fetch('?action=recettes_sous_aliment&id_aliment=' + id_sousaliment)
+        fetch('?action=recettesavecalim&id_aliment=' + id_sousaliment)
             .then(response => response.text())
-            .then(html => conteneur.innerHTML = html)
-            .catch(err => conteneur.innerHTML = "<p>Erreur lors du chargement des recettes.</p>");
+            .then(html => conteneur.innerHTML = html)  //met l'affichage au bon endroit
+            .catch(err => conteneur.innerHTML = "<p>Erreur lors du chargement des recettes</p>");
     }
 </script>
 
@@ -180,28 +182,27 @@ require_once("connect_db.php");
 <section class="contenu">
     <h2>Arborescence des aliments</h2>
 
-    <!-- Boutons racines -->
+    <!-- AFFICHAGE DES BOUTONS A LA BASE -->
     <div id="div_racines">
-    <?php foreach ($racine as $rac) { ?>  
+    <?php foreach ($racine as $rac) { ?>   
         <button 
             class="boutonRacine" 
             data-id="<?php echo $rac['id_aliment']; ?>"
             onclick="
-                this.style.backgroundColor='#FFD700';
-                afficherSousaliment('<?php echo $rac['id_aliment']; ?>', document.getElementById('arborecence'));
-                afficherRecettesSousAliment('<?php echo $rac['id_aliment']; ?>');
+                this.style.backgroundColor='#FFD700';  //passe dorés si on clic dessus , na change jamais vu qu'il y en a que 1 
+                afficherSousaliment('<?php echo $rac['id_aliment']; ?>', document.getElementById('arborecence'));  //affiche les sous elem de la racine
+                afficherRecettesSousAliment('<?php echo $rac['id_aliment']; ?>');  // affiche les recettes qui contiennent la racine (aucune normalement)
             ">
             <?php echo htmlspecialchars($rac['nom']) ?>
         </button>
     <?php } ?>
     </div>
 
-    <!-- Conteneur de l'arborescence -->
+ <!-- CONTENEUR ARBO -->
     <div id="arborecence"></div>
-
-    <!-- Conteneur des recettes filtrées -->
+ <!-- CONTENEUR RECETTES -->
     <h2>Recettes contenant le sous-aliment sélectionné</h2>
-    <div id="recettes-filtrees" class="bloc-recette"></div>
+    <div id="recettes" class="bloc-recette"></div>
 </section>
 
 </body>
