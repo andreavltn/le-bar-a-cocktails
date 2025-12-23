@@ -1,20 +1,18 @@
+/* Tout le bas de la page sous la bannière */
 .contenu {
     padding: 20px;
     box-sizing: border-box;
 }
 
-/* conteneur */
+/* Conteneur pour les cartes des recettes */
 .bloc-recette {
     padding: 40px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
 }
 
-/* Grille de cartes : 4 par ligne sur desktop */
-.bloc-recette {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 30px;
-}
-
+/* Carte recette */
 .recette-container {
     background: #ffffff;
     border-radius: 18px;
@@ -29,8 +27,6 @@
     box-shadow: 0 18px 35px rgba(0, 0, 0, 0.15);
     cursor: pointer;
 }
-
-
 
 /* Image de la recette */
 .recette-image {
@@ -87,6 +83,7 @@
     color: #333;
     margin-bottom: 12px;
 }
+
 /* Tags des ingrédients clés */
 .tags-ingredients {
     display: flex;

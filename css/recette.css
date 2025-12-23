@@ -76,8 +76,8 @@
     word-break: break-word; /* Coupe les mots trop longs si besoin */
 }
 
-.image-like,
-.image-like.actif {
+/* L'étoile pour le like */
+.image-like, .image-like.actif {
     width: 28px;
     height: 28px;
     cursor: pointer;
@@ -160,7 +160,7 @@
     display: inline-block;
 }
 
-/* Message d'erreur */
+/* Message d'erreur centré si il n'y a pas de recette */
 .erreur-recette {
     text-align: center;
     padding: 60px 20px;
