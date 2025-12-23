@@ -67,6 +67,7 @@
     </section>
 
     <script>
+
         // fonction qui affiche un pop up pour valider la déconnexion
         function confirmerDeconnexion() {
             if (confirm('Souhaitez vous vraiment vous déconnecter ?')) {
@@ -74,6 +75,7 @@
                 window.location.href = 'account/logout.php';
             }
         }
+        
     </script>
 
 </body>

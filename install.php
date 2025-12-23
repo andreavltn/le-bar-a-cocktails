@@ -9,9 +9,10 @@
         die("Erreur de connexion : " . mysqli_connect_error());
     }
 
-    // création de la base
+    // suppression de la base si elle existe déjà
     mysqli_query($mysqli, "DROP DATABASE IF EXISTS boissons");
 
+    // création de la base
     $requete = "CREATE DATABASE IF NOT EXISTS boissons CHARACTER SET utf8mb4;";
     if (!mysqli_query($mysqli, $requete)) {
         die("Erreur création base : " . mysqli_error($mysqli));
@@ -107,10 +108,8 @@
 	    die("Erreur création table aliments : " . mysqli_error($mysqli));
     }
 
-    // affiche le nombre d'aliments à insérer
-    $total_aliments = count($Hierarchie);
-    
-    foreach ($Hierarchie as $nom => $data) {  // parcours de l'array hierarchie
+    // parcours de l'array hierarchie
+    foreach ($Hierarchie as $nom => $data) {  
 
          $nom = mysqli_real_escape_string($mysqli, $nom);
     
@@ -123,8 +122,7 @@
         }
     }
 
-    // Création table hierarchie
-    
+    // création table hierarchie
     $requete = "
         CREATE TABLE hierarchie(
             id_aliment INT NOT NULL,
@@ -133,25 +131,26 @@
             FOREIGN KEY (id_aliment) REFERENCES aliments(id_aliment)
         );
     ";
-    	if (!mysqli_query($mysqli, $requete)) {
-	die("Erreur création table hierarchie : " . mysqli_error($mysqli));
+    	
+    if (!mysqli_query($mysqli, $requete)) {
+	    die("Erreur création table hierarchie : " . mysqli_error($mysqli));
     }
 
-    // compteur pour les relations hiérarchiques
-    $nb_relations_hierarchie = 0;
-    
-        foreach ($Hierarchie as $nom => $data) {  //parcours de l'array hierarchie
+    // parcours de l'array hierarchie
+    foreach ($Hierarchie as $nom => $data) {  
 
-         $nom = mysqli_real_escape_string($mysqli, $nom);
-         $requete = "SELECT id_aliment FROM aliments WHERE nom = '$nom';";
+        $nom = mysqli_real_escape_string($mysqli, $nom);
+        $requete = "SELECT id_aliment FROM aliments WHERE nom = '$nom';"; 
          
-         $result = mysqli_query($mysqli, $requete); 
-         $row = mysqli_fetch_row($result);
-         $id = $row[0];
-         
-         if (isset($data['sous-categorie']) && is_array($data['sous-categorie'])) { //check si l'aliment a une sous categorie
-         
-        foreach ($data['sous-categorie'] as $sous_nom) {            //regarde les sous categories de l'element ou on est
+        $result = mysqli_query($mysqli, $requete); 
+        $row = mysqli_fetch_row($result);
+        $id = $row[0];
+        
+        // check si l'aliment a une sous categorie
+        if (isset($data['sous-categorie']) && is_array($data['sous-categorie'])) { 
+            
+            // regarde les sous categories de l'élement courant
+            foreach ($data['sous-categorie'] as $sous_nom) {            
                 $sous_nom = mysqli_real_escape_string($mysqli, $sous_nom);
                 $requete = "SELECT id_aliment FROM aliments WHERE nom = '$sous_nom';";
          
@@ -159,22 +158,19 @@
          		$row = mysqli_fetch_row($result);
          		$idsc = $row[0];
          
-    	
-         	$requete = "INSERT INTO hierarchie(id_aliment,id_sous_categorie)
-                    	VALUES ($id,$idsc);";    //ajoute a la table l'aliment et une de ses sous categories
+                // ajoute a la table hierarchie la relation aliment <-> sous-categorie
+         	    $requete = "INSERT INTO hierarchie(id_aliment,id_sous_categorie)
+                    	    VALUES ($id,$idsc);";   
 
-    if (!mysqli_query($mysqli, $requete)) {
-	die("Erreur création update table hierarchie " . mysqli_error($mysqli));
-	
-	
-	}
-	$nb_relations_hierarchie++;
-    }}
+                if (!mysqli_query($mysqli, $requete)) {
+	                die("Erreur création update table hierarchie " . mysqli_error($mysqli));
+	            }
+            }
+        }
     }
   
     
-    //Création table ingredient_recette
-    
+    // création table ingredient_recette
     $requete = "
         CREATE TABLE ingredient_recette(
             id_recette INT NOT NULL,
@@ -184,48 +180,43 @@
             FOREIGN KEY (id_recette) REFERENCES recettes(id_recette)
         );
     ";
-    	if (!mysqli_query($mysqli, $requete)) {
-	die("Erreur création table ingredient_recette: " . mysqli_error($mysqli));
+
+    if (!mysqli_query($mysqli, $requete)) {
+	    die("Erreur création table ingredient_recette: " . mysqli_error($mysqli));
     }
 
-    // compteur pour les relations ingrédients-recettes
-    $nb_relations_ingredients = 0;
     
-        $i = 0;
-    	while ($i < count($Recettes)) {   //parcours de l'array recette 
+    $i = 0;
 
-         $titre = mysqli_real_escape_string($mysqli, $Recettes[$i]["titre"]);
-         $requete = "SELECT id_recette FROM recettes WHERE titre = '$titre';";
+    // parcours de l'array recette 
+    while ($i < count($Recettes)) {  
+
+        $titre = mysqli_real_escape_string($mysqli, $Recettes[$i]["titre"]);
+        $requete = "SELECT id_recette FROM recettes WHERE titre = '$titre';";
          
-         $result = mysqli_query($mysqli, $requete); 
-         $row = mysqli_fetch_row($result);
-         $idrecette = $row[0];
+        $result = mysqli_query($mysqli, $requete); 
+        $row = mysqli_fetch_row($result);
+        $idrecette = $row[0];
          
         
-        foreach ($Recettes[$i]['index'] as $ingredient) {            //regarde les sous categories de l'element ou on est
-                $ingredient = mysqli_real_escape_string($mysqli, $ingredient);
-                $requete = "SELECT distinct id_aliment FROM aliments WHERE nom = '$ingredient';";
+        foreach ($Recettes[$i]['index'] as $ingredient) {            // regarde les sous categories de l'element ou on est
+            $ingredient = mysqli_real_escape_string($mysqli, $ingredient);
+            $requete = "SELECT distinct id_aliment FROM aliments WHERE nom = '$ingredient';";
          
-         		$result = mysqli_query($mysqli, $requete); 
-         		$row = mysqli_fetch_row($result);
-         		$idingredient = $row[0];
+     		$result = mysqli_query($mysqli, $requete); 
+     		$row = mysqli_fetch_row($result);
+        	$idingredient = $row[0];
          
     	
          	$requete = "INSERT IGNORE INTO ingredient_recette(id_recette,id_ingredient)
-                    	VALUES ($idrecette,$idingredient);";    //ajoute a la table l'aliment et une de ses sous categories
+                    	VALUES ($idrecette,$idingredient);";    // ajoute a la table l'aliment et une de ses sous categories
 
-    if (!mysqli_query($mysqli, $requete)) {
-	die("Erreur création update table ingredient_recette " . mysqli_error($mysqli));
-	
-	
-	        } else {
-	        // si l'insertion a réussi, incrémente le compteur
-	        if (mysqli_affected_rows($mysqli) > 0) {
-	            $nb_relations_ingredients++;
-	        }
-	    }
+            if (!mysqli_query($mysqli, $requete)) {
+                die("Erreur création update table ingredient_recette " . mysqli_error($mysqli));
+            } 
         }
-    $i++;    
+
+        $i++;    
     }
 
     // fermeture de la connexion

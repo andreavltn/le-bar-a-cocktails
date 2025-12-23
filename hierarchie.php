@@ -32,17 +32,17 @@ require_once("connect_db.php");
     if (isset($_GET['action']) && $_GET['action'] === 'recettesavecalim' && isset($_GET['id_aliment'])) { // lance la requete si on a fait le fetch
         $id_aliment = (int)$_GET['id_aliment'];  //recup de l'id aliment
 
- //recup des recettes qui contiennent l'aliment
+        //recup des recettes qui contiennent l'aliment
         $sql = "SELECT id_recette, titre, ingredients
                 FROM recettes 
                 INNER JOIN ingredient_recette USING (id_recette)
                 WHERE id_ingredient = ?";
-            $requete = mysqli_prepare($dblink, $sql);
-            mysqli_stmt_bind_param($requete, "i", $id_aliment);
-            mysqli_stmt_execute($requete);
-            $result = mysqli_stmt_get_result($requete);
+        $requete = mysqli_prepare($dblink, $sql);
+        mysqli_stmt_bind_param($requete, "i", $id_aliment);
+        mysqli_stmt_execute($requete);
+        $result = mysqli_stmt_get_result($requete);
 
-            //si on trouve des recettes on les affiche
+        //si on trouve des recettes on les affiche
         if (mysqli_num_rows($result) > 0) {
             while ($recette = mysqli_fetch_assoc($result)) {
                 echo '<div class="recette-container" onclick="window.location.href=\'recette.php?id=' . $recette['id_recette'] . '\'">';

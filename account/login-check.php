@@ -10,12 +10,7 @@
     // requête pour rechercher l'utilisateur avec le pseudo
     $sql_pseudo = "SELECT * FROM utilisateur WHERE pseudo = ?"; 
     $req_pseudo = mysqli_prepare($dblink, $sql_pseudo); // préparation de la requête
-
-    if ($req_pseudo === false) { // si la requête génère une erreur : stop
-        die("Erreur prepare: " . mysqli_error($dblink));
-    }
-
-    mysqli_stmt_bind_param($req_pseudo, "s", $pseudo); // pseudo est un string
+    mysqli_stmt_bind_param($req_pseudo, "s", $pseudo); // liaison du paramètre (chaine)
     mysqli_stmt_execute($req_pseudo); // execution de la requête
     $resultat_pseudo = mysqli_stmt_get_result($req_pseudo); // récupération du résultat
 

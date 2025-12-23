@@ -87,7 +87,7 @@
                         $ingredients_par_recette[$tag['id_recette']][] = $tag['nom'];
                     }
 
-    //boucle des reettes                     
+    // boucle des reettes                     
     while ($recette = mysqli_fetch_assoc($resultat)) {
 
         echo '<div class="recette-container" onclick="window.location.href=\'recette.php?id=' . $recette['id_recette'] . '\'">';
@@ -150,6 +150,7 @@
     </section>
 
     <script>
+
         // fonction qui affiche un pop up pour valider la déconnexion
         function confirmerDeconnexion() {
             if (confirm('Souhaitez vous vraiment vous déconnecter ?')) {
@@ -157,6 +158,7 @@
                 window.location.href = 'account/logout.php';
             }
         }
+        
     </script>
 
 </body>

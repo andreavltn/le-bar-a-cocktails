@@ -124,6 +124,7 @@
         // sauvegarde du texte original du bouton
         const texteBoutonOriginal = submitBtn.textContent;
         
+        // bloc pour empecher la connexion si les deux mdp ne correspondent pas
         // vérifier quand on change le premier mdp
         mdpInput.addEventListener('input', function() {
             if (mdpInput.value !== mdp2Input.value) { // si les valeurs sont différentes

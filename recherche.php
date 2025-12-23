@@ -511,7 +511,7 @@ afficherGrilleAliments(aliments, "GrilleAliments");
 afficherGrilleBoissons(boissons, "GrilleBoissons");
 
   document.getElementById("helpBtn").addEventListener("click", function () {
-    alert("Voici l'aide :\n- Le 1er clic selectionne l'aliment (vert)\n- Le 2nd clic interdit l'aliment (rouge)\n- Le 3eme clic deselectionne l'aliment \n- Un super aliment selectionne et interdit aussi ses sous aliments (jaune / rouge foncé)");
+    alert("Voici l'aide :\n- Le 1er clic sélectionne l'aliment (vert)\n- Le 2nd clic interdit l'aliment (rouge)\n- Le 3eme clic déselectionne l'aliment \n- Un super aliment selectionné en rouge interdit aussi ses sous-aliments (jaune/rouge foncé)");
   });
 
 </script>
