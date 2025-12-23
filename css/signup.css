@@ -1,3 +1,8 @@
+/* Taille du logo dans la bannière */
+.banniere-bloc-milieu img {
+    width: 100px;
+}
+
 /* Contenu principal */
 .contenu {
     padding: 16px;

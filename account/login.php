@@ -11,6 +11,7 @@
     <meta charset="UTF-8">
     <title>Connexion | Le bar à cocktails</title>
     <link rel="shortcut icon" href="../images/logo-site.png">
+    <link rel="stylesheet" href="../css/structure-page.css">
     <link rel="stylesheet" href="../css/login.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
