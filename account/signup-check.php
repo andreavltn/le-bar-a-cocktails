@@ -13,26 +13,13 @@
     $adresse = $_POST["adresse"];
     $code_postal = $_POST["code_postal"];
     $ville = $_POST["ville"];
-    $tel = $_POST["tel"];
-    
+    $tel = $_POST["tel"];   
 
-    // si les deux mots de passe entrés ne correspondent pas
-    if($mdp != $mdp2){ 
-        header("Location: signup.php?erreur_mdp=1"); // renvoi sur le formulaire avec l'erreur de mdp
-        exit(); // sortie
-    }
-
-
-    // requête pour recherche les lignes avec le pseudo
+    // requête pour rechercher si le pseudo existe déjà
     $sql_pseudo = "SELECT * FROM utilisateur WHERE pseudo=?"; 
     $req_pseudo = $dblink->prepare($sql_pseudo); // préparation de la requête
-
-    if ($req_pseudo === false) { // si la requête génère une erreur : stop
-        die("Erreur prepare: " . $dblink->error);
-    }
-
-    $req_pseudo->bind_param("s", $pseudo); // pseudo est un string
-    $req_pseudo->execute(); // execution de la requête
+    $req_pseudo->bind_param("s", $pseudo); // liaison du paramètre (chaine)
+    $req_pseudo->execute(); // exécution de la requête
     $resultat_pseudo = $req_pseudo->get_result(); // récupération du résultat
 
     // si un compte existe déjà avec le pseudo
@@ -44,7 +31,9 @@
 
     // sinon tout est bon, on insère dans la bdd
 
-    // préparation des variables non-obligatoires (null si elles ne sont pas renseignées, sinon elles gardent leur valeur)
+    // préparation des variables non-obligatoires 
+    // null si elles ne sont pas renseignées
+    // sinon elles gardent leur valeur
     $nom_val = !empty($nom) ? $nom : null;
     $prenom_val = !empty($prenom) ? $prenom : null;
     $sexe_val = !empty($sexe) ? $sexe : null;
@@ -57,7 +46,7 @@
     $sql = "INSERT INTO utilisateur(pseudo, mdp, nom, prenom, sexe, email, date_naissance, adresse, code_postal, ville, tel) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; // requête d'insertion dans la base
     $req_finale = $dblink->prepare($sql); // préparation de la requête
-    $req_finale->bind_param("sssssssssss", // toutes les variables sont des string
+    $req_finale->bind_param("sssssssssss", // liaison des paramètres (chaines)
         $pseudo, 
         $mdp, 
         $nom_val, 
@@ -74,7 +63,7 @@
 
     // affichage du popup et redirection
     echo "<script>
-        alert('Le compte a été créé avec succès');
+        alert('Le compte a été créé avec succès! Vous pouvez maintenant vous connecter.');
         window.location.href = 'login.php';
     </script>";
 
