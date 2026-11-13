@@ -3,7 +3,7 @@
 Application web interactive de découverte, de recherche et de gestion de recettes de cocktails.
 
 ## Accès et versions
-* **Version en ligne :** https://le-bar-a-cocktails.infinityfree.me/
+* **Version en ligne :** le-bar-a-cocktails.freedev.app
 * **Version sur ce dépôt :** Version locale du projet
 
 ## Fonctionnalités principales
@@ -22,4 +22,3 @@ Application web interactive de découverte, de recherche et de gestion de recett
 1. Placer les fichiers dans le répertoire racine du serveur local (ex : `htdocs` sous XAMPP).
 2. Lancer les services Apache et MariaDB.
 3. Ouvrir l'URL du projet dans le navigateur : le fichier de connexion initialise et remplit automatiquement la base de données si elle n'existe pas.
-```[cite: 3, 4, 5, 6]
